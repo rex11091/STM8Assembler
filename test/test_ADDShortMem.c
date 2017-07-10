@@ -14,15 +14,15 @@ void tearDown(void)
 {
 }
 
-void test_assemble_ADDShortmem_ADD_ShortMem__expect_exception(void){
+void test_assemble_ADDShortmem_ADD_ShortMem__A_55_expect_exception(void){
 	CEXCEPTION_T ex;
 	int machineCode;
 	Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-	IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"ADD"};
-	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"A"};
+	IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"add"};
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"a"};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 8,1,","};
 	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 9,1,"$"};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,10,2,"ss",55};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,10,2,"55",55};
 	//IdentifierToken fffToken = {TOKEN_IDENTIFIER_TYPE, 17, 3,7 "fff"};
 
 	initTokenizer_ExpectAndReturn("   ADD A,$55",tokenizer);

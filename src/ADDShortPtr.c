@@ -1,4 +1,4 @@
-#include "ADDShortoff.h"
+#include "ADDShortPtr.h"
 #include <string.h>
 #include <stdio.h>
 #include "Tokenizer.h"
@@ -7,7 +7,7 @@
 #include "CException.h"
 
 
-int ADDShortoffX(char *assemblyCode){
+int ADDShortPtr(char *assemblyCode){
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -15,11 +15,11 @@ int ADDShortoffX(char *assemblyCode){
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)) {
+	    if(strcmp(idToken->str, "ADD") == 0) {
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
@@ -27,7 +27,7 @@ int ADDShortoffX(char *assemblyCode){
                   token = getToken(tokenizer);
                   if(token->type == TOKEN_OPERATOR_TYPE){
                     opToken = (OperatorToken *)token;
-                    if(strcmp(opToken->str,"(") == 0){
+                    if(strcmp(opToken->str,"[") == 0){
                       token = getToken(tokenizer);
                       if(token->type == TOKEN_OPERATOR_TYPE){
                       opToken = (OperatorToken *)token;
@@ -44,21 +44,21 @@ int ADDShortoffX(char *assemblyCode){
                       token = getToken(tokenizer);
                       if(token->type == TOKEN_OPERATOR_TYPE){
                       opToken = (OperatorToken *)token;
-                      if(strcmp(opToken->str,",") == 0){
+                      if(strcmp(opToken->str,".") == 0){
                        token = getToken(tokenizer);
                       if(token->type == TOKEN_IDENTIFIER_TYPE){
                         idToken = (IdentifierToken *)token;
-                        if((strcmp(idToken->str, "X") == 0) || (strcmp(idToken->str, "x") == 0)){
+                        if(strcmp(idToken->str, "W") == 0){
                            token = getToken(tokenizer);
                             if(token->type == TOKEN_OPERATOR_TYPE){
                                opToken = (OperatorToken *)token;
-                               if(strcmp(opToken->str,")" )== 0){
+                               if(strcmp(opToken->str,"]" )== 0){
               /*                 //  printf("asdasdas");
                 */            }
                             else{
                                 Throw(NOT_VALID_OPERATOR);
                                }
-                            return 0xEB00 + (intToken->value & 0xff);
+                            return 0x92CB00 + (intToken->value & 0xff);
                  }
              }
              else{
@@ -102,9 +102,7 @@ int ADDShortoffX(char *assemblyCode){
 }
 }
 
-
-
-int ADDShortoffY(char *assemblyCode){
+int ADDShortPtrXIndexFile(char *assemblyCode){
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -112,114 +110,23 @@ int ADDShortoffY(char *assemblyCode){
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
+	    if(strcmp(idToken->str, "ADD") == 0) {
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
                 if(strcmp(opToken->str, ",") == 0){
                   token = getToken(tokenizer);
-                  if(token->type == TOKEN_OPERATOR_TYPE){
-                    opToken = (OperatorToken *)token;
-                    if(strcmp(opToken->str,"(") == 0){
-                      token = getToken(tokenizer);
-                      if(token->type == TOKEN_OPERATOR_TYPE){
+                    if(token->type == TOKEN_OPERATOR_TYPE){
                       opToken = (OperatorToken *)token;
-                      if(strcmp(opToken->str,"$") == 0){
-                      token = getToken(tokenizer);
-                      if(token->type == TOKEN_INTEGER_TYPE){
-                      IntegerToken *intToken = (IntegerToken *)token;
-     			              if(intToken->value > 0xff) {
-                          printf("Error: Limit exceeded: Allowed range is 0xffffffffffffff80 - 0xff (-128 - 255)\n");
-                          //printf("Warning Argument out of range.Least significant bits used.\n");
-                           printf("ADD A,#$%d\n       ^", intToken->value);
-                           Throw(LIMIT_EXCEEDED);
-                          }
-                      token = getToken(tokenizer);
-                      if(token->type == TOKEN_OPERATOR_TYPE){
-                      opToken = (OperatorToken *)token;
-                      if(strcmp(opToken->str,",") == 0){
-                       token = getToken(tokenizer);
-                      if(token->type == TOKEN_IDENTIFIER_TYPE){
-                        idToken = (IdentifierToken *)token;
-                        if((strcmp(idToken->str, "Y") == 0) || (strcmp(idToken->str, "y") == 0)){
-                           token = getToken(tokenizer);
-                            if(token->type == TOKEN_OPERATOR_TYPE){
-                               opToken = (OperatorToken *)token;
-                               if(strcmp(opToken->str,")" )== 0){
-              /*                 //  printf("asdasdas");
-                */            }
-                            else{
-                                Throw(NOT_VALID_OPERATOR);
-                               }
-                            return 0x90EB00 + (intToken->value & 0xff);
-                 }
-             }
-             else{
-           Throw(NOT_VALID_INSTRUCTION);
-         }
-           }
-         }
-         else{
-       Throw(NOT_VALID_INSTRUCTION);
-       }
-       }
-
-   }
-        else{
-          Throw(NOT_VALID_OPERAND);
-        }
-          }
-         else{
-           Throw(NOT_VALID_OPERATOR);
-         }
-             }
-           }
-             else{
-               Throw(NOT_VALID_OPERATOR);
-             }
-          }
-        }
-            else{
-              Throw(NOT_VALID_OPERATOR);
-            }
-          }
-        }
-        else{
-      Throw(NOT_VALID_INSTRUCTION);
-    }
-  }
-}
-  else{
-    Throw(NOT_VALID_INSTRUCTION);
-  }
-}
-}
-
-int ADDShortoffSP(char *assemblyCode){
- Tokenizer *tokenizer = initTokenizer(assemblyCode);
- Token *token = getToken(tokenizer);
- IdentifierToken *idToken;
- IntegerToken *intToken;
- OperatorToken *opToken;
-  if(token->type == TOKEN_IDENTIFIER_TYPE){
-	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
-        token = getToken(tokenizer);
-        if(token->type == TOKEN_IDENTIFIER_TYPE){
-          idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
-            token = getToken(tokenizer);
-              if(token->type == TOKEN_OPERATOR_TYPE){
-                opToken = (OperatorToken *)token;
-                if(strcmp(opToken->str, ",") == 0){
+                      if(strcmp(opToken->str, "(") == 0){
                   token = getToken(tokenizer);
                   if(token->type == TOKEN_OPERATOR_TYPE){
                     opToken = (OperatorToken *)token;
-                    if(strcmp(opToken->str,"(") == 0){
+                    if(strcmp(opToken->str,"[") == 0){
                       token = getToken(tokenizer);
                       if(token->type == TOKEN_OPERATOR_TYPE){
                       opToken = (OperatorToken *)token;
@@ -236,31 +143,55 @@ int ADDShortoffSP(char *assemblyCode){
                       token = getToken(tokenizer);
                       if(token->type == TOKEN_OPERATOR_TYPE){
                       opToken = (OperatorToken *)token;
-                      if(strcmp(opToken->str,",") == 0){
+                      if(strcmp(opToken->str,".") == 0){
                        token = getToken(tokenizer);
                       if(token->type == TOKEN_IDENTIFIER_TYPE){
                         idToken = (IdentifierToken *)token;
-                      if((strcmp(idToken->str, "S") == 0) || (strcmp(idToken->str, "s") == 0)){
-                          token = getToken(tokenizer);
-                          if(token->type == TOKEN_IDENTIFIER_TYPE){
-                          idToken = (IdentifierToken *)token;
-                          if((strcmp(idToken->str, "P") == 0) || (strcmp(idToken->str, "p") == 0)){
+                        if(strcmp(idToken->str, "W") == 0){
                            token = getToken(tokenizer);
                             if(token->type == TOKEN_OPERATOR_TYPE){
                                opToken = (OperatorToken *)token;
-                               if(strcmp(opToken->str,")" )== 0){
-              /*                 //  printf("asdasdas");
-                */            }
+                               if(strcmp(opToken->str,"]" )== 0){
+
+                                 token = getToken(tokenizer);
+                                  if(token->type == TOKEN_OPERATOR_TYPE){
+                                     opToken = (OperatorToken *)token;
+                                     if(strcmp(opToken->str,"," )== 0){
+
+                                       token = getToken(tokenizer);
+                                      if(token->type == TOKEN_IDENTIFIER_TYPE){
+                                        idToken = (IdentifierToken *)token;
+                                        if(strcmp(idToken->str, "X") == 0){
+
+                                          token = getToken(tokenizer);
+                                           if(token->type == TOKEN_OPERATOR_TYPE){
+                                              opToken = (OperatorToken *)token;
+                                              if(strcmp(opToken->str,")" )== 0){
+
+                                            }
+                                            else{
+                                              Throw(NOT_VALID_OPERATOR);
+                                            }
+                                                                              return 0x92DB00 + (intToken->value & 0xff);
+                                          }
+
+                                      }
+                                          else {
+                                            Throw(NOT_VALID_INSTRUCTION);
+                                          }
+
+                                        }
+                                   }
+                                   else {
+                                       Throw(NOT_VALID_OPERATOR);
+                                      }
+                                    }
+                                 }
                             else{
                                 Throw(NOT_VALID_OPERATOR);
                                }
-                            return 0x1B00 + (intToken->value & 0xff);
+
                  }
-               }
-               else{
-               Throw(NOT_VALID_INSTRUCTION);
-             }
-             }
              }
              else{
            Throw(NOT_VALID_INSTRUCTION);
@@ -286,6 +217,152 @@ int ADDShortoffSP(char *assemblyCode){
                Throw(NOT_VALID_OPERATOR);
              }
           }
+
+        }
+        else{
+          Throw(NOT_VALID_OPERATOR);
+        }
+
+      }
+        }
+            else{
+              Throw(NOT_VALID_OPERATOR);
+            }
+          }
+        }
+        else{
+      Throw(NOT_VALID_INSTRUCTION);
+    }
+  }
+}
+  else{
+    Throw(NOT_VALID_INSTRUCTION);
+  }
+}
+}
+
+int ADDShortPtrYIndexFile(char *assemblyCode){
+ Tokenizer *tokenizer = initTokenizer(assemblyCode);
+ Token *token = getToken(tokenizer);
+ IdentifierToken *idToken;
+ IntegerToken *intToken;
+ OperatorToken *opToken;
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+	   idToken = (IdentifierToken *)token;
+	    if(strcmp(idToken->str, "ADD") == 0) {
+        token = getToken(tokenizer);
+        if(token->type == TOKEN_IDENTIFIER_TYPE){
+          idToken = (IdentifierToken *)token;
+          if(strcmp(idToken->str, "A") == 0){
+            token = getToken(tokenizer);
+              if(token->type == TOKEN_OPERATOR_TYPE){
+                opToken = (OperatorToken *)token;
+                if(strcmp(opToken->str, ",") == 0){
+                  token = getToken(tokenizer);
+                    if(token->type == TOKEN_OPERATOR_TYPE){
+                      opToken = (OperatorToken *)token;
+                      if(strcmp(opToken->str, "(") == 0){
+                  token = getToken(tokenizer);
+                  if(token->type == TOKEN_OPERATOR_TYPE){
+                    opToken = (OperatorToken *)token;
+                    if(strcmp(opToken->str,"[") == 0){
+                      token = getToken(tokenizer);
+                      if(token->type == TOKEN_OPERATOR_TYPE){
+                      opToken = (OperatorToken *)token;
+                      if(strcmp(opToken->str,"$") == 0){
+                      token = getToken(tokenizer);
+                      if(token->type == TOKEN_INTEGER_TYPE){
+                      IntegerToken *intToken = (IntegerToken *)token;
+     			              if(intToken->value > 0xff) {
+                          printf("Error: Limit exceeded: Allowed range is 0xffffffffffffff80 - 0xff (-128 - 255)\n");
+                          //printf("Warning Argument out of range.Least significant bits used.\n");
+                           printf("ADD A,#$%d\n       ^", intToken->value);
+                           Throw(LIMIT_EXCEEDED);
+                          }
+                      token = getToken(tokenizer);
+                      if(token->type == TOKEN_OPERATOR_TYPE){
+                      opToken = (OperatorToken *)token;
+                      if(strcmp(opToken->str,".") == 0){
+                       token = getToken(tokenizer);
+                      if(token->type == TOKEN_IDENTIFIER_TYPE){
+                        idToken = (IdentifierToken *)token;
+                        if(strcmp(idToken->str, "W") == 0){
+                           token = getToken(tokenizer);
+                            if(token->type == TOKEN_OPERATOR_TYPE){
+                               opToken = (OperatorToken *)token;
+                               if(strcmp(opToken->str,"]" )== 0){
+
+                                 token = getToken(tokenizer);
+                                  if(token->type == TOKEN_OPERATOR_TYPE){
+                                     opToken = (OperatorToken *)token;
+                                     if(strcmp(opToken->str,"," )== 0){
+
+                                       token = getToken(tokenizer);
+                                      if(token->type == TOKEN_IDENTIFIER_TYPE){
+                                        idToken = (IdentifierToken *)token;
+                                        if(strcmp(idToken->str, "Y") == 0){
+
+                                          token = getToken(tokenizer);
+                                           if(token->type == TOKEN_OPERATOR_TYPE){
+                                              opToken = (OperatorToken *)token;
+                                              if(strcmp(opToken->str,")" )== 0){
+
+                                            }
+                                            else{
+                                              Throw(NOT_VALID_OPERATOR);
+                                            }
+                                                                              return 0x91DB00 + (intToken->value & 0xff);
+                                          }
+
+                                      }
+                                          else {
+                                            Throw(NOT_VALID_INSTRUCTION);
+                                          }
+
+                                        }
+                                   }
+                                   else {
+                                       Throw(NOT_VALID_OPERATOR);
+                                      }
+                                    }
+                                 }
+                            else{
+                                Throw(NOT_VALID_OPERATOR);
+                               }
+
+                 }
+             }
+             else{
+           Throw(NOT_VALID_INSTRUCTION);
+         }
+           }
+         }
+         else{
+       Throw(NOT_VALID_INSTRUCTION);
+       }
+       }
+
+   }
+        else{
+          Throw(NOT_VALID_OPERAND);
+        }
+          }
+         else{
+           Throw(NOT_VALID_OPERATOR);
+         }
+             }
+           }
+             else{
+               Throw(NOT_VALID_OPERATOR);
+             }
+          }
+
+        }
+        else{
+          Throw(NOT_VALID_OPERATOR);
+        }
+
+      }
         }
             else{
               Throw(NOT_VALID_OPERATOR);

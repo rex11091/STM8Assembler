@@ -13,7 +13,7 @@ void tearDown(void)
 {
 }
 
-void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
+void test_asesemble_ADDByte_ADD_A_Y_index_file_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -35,7 +35,7 @@ void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
   getToken_ExpectAndReturn(tokenizer, (Token *)&BackBracketToken);
   Try {
     machineCode = ADDY("   ADD A,(Y)");
-    printf("the instruction opcode is %#4x",machineCode);
+    printf("the instruction [   ADD A,(Y)   ] opcode is %#4x",machineCode);
   }Catch(ex) {
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
   }

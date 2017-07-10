@@ -13,16 +13,17 @@ void tearDown(void)
 {
 }
 
+
 void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"ADD"};
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"A"};
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"add"};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"a"};
   OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 8,1,","};
   OperatorToken   HashTagToken ={TOKEN_OPERATOR_TYPE, 9,1,"#"};
   OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 10,1,"$"};
-  IntegerToken intToken = {TOKEN_INTEGER_TYPE,11,2,"50",50};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,11,4,"0x50",0x50};
   //IdentifierToken fffToken = {TOKEN_IDENTIFIER_TYPE, 17, 3,7 "fff"};
 
   initTokenizer_ExpectAndReturn("   ADD A,#$50",tokenizer);
@@ -35,7 +36,7 @@ void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
 
   Try {
     machineCode = ADDByte("   ADD A,#$50");
-    printf("the instruction opcode is %#4x",machineCode);
+    printf("the instruction [    ADD A,#$50    ] opcode is %#4x",machineCode);
   }Catch(ex) {
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
   }
