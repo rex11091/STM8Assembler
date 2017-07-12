@@ -7,19 +7,42 @@
 #include "CException.h"
 
 
+
+
+
+char *convertToUpperCase(char *name)
+{
+  int i = 0;
+  char *buffer;
+  buffer = (char*)malloc(strlen(name)+1);
+  strcpy(buffer,name);
+  printf("before convertToUpperCase %s\n",buffer);
+  while(buffer[i] != '\0')
+  {
+    buffer[i] = toupper(buffer[i]);
+    ++i;
+  }
+  printf("after convertToUpperCase %s\n",buffer);
+  return buffer;
+  free(buffer);
+}
+
+
 int ADDByte(char *assemblyCode){
- Tokenizer *tokenizer = initTokenizer(assemblyCode);
+  char *result;
+ result = convertToUpperCase(assemblyCode);
+ Tokenizer *tokenizer = initTokenizer(result);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
  IntegerToken *intToken;
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
+	    if(strcmp(idToken->str, "ADD") == 0){
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
@@ -41,6 +64,7 @@ int ADDByte(char *assemblyCode){
 				                   printf("ADD A,#$%d\n       ^", intToken->value);
                            Throw(LIMIT_EXCEEDED);
 			                         }
+
 			                           return 0xAB00 + (intToken->value & 0xff);
 		          }else{
 			           Throw(NOT_VALID_OPERAND);
