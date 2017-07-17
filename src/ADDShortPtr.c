@@ -5,9 +5,11 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
+#include "touppercase.h"
 
 
 int ADDShortPtr(char *assemblyCode){
+  assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -103,6 +105,7 @@ int ADDShortPtr(char *assemblyCode){
 }
 
 int ADDShortPtrXIndexFile(char *assemblyCode){
+  assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -242,6 +245,7 @@ int ADDShortPtrXIndexFile(char *assemblyCode){
 }
 
 int ADDShortPtrYIndexFile(char *assemblyCode){
+  assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;

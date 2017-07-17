@@ -5,21 +5,24 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
+#include "touppercase.h"
+
 
 
 int ADDShortMem(char *assemblyCode){
- Tokenizer *tokenizer = initTokenizer(assemblyCode);
+assemblyCode = convertToUpperCase(assemblyCode);
+Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
  IntegerToken *intToken;
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	   if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
+	   if(strcmp(idToken->str, "ADD") == 0){
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
@@ -37,10 +40,10 @@ int ADDShortMem(char *assemblyCode){
                        printf("ADD A,#$%d\n       ^", intToken->value);
                        Throw(LIMIT_EXCEEDED);
 			                         }
-			                           return 0xB900 + (intToken->value & 0xff);
 		          }else{
 			           Throw(NOT_VALID_OPERAND);
 		             }
+                 return 0xB900 + (intToken->value & 0xff);
                }
                else{
                  Throw(NOT_VALID_OPERATOR);

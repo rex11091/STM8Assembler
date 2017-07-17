@@ -5,6 +5,7 @@
 #include "Token.h"
 #include "error.h"
 #include "Exception.h"
+#include "touppercase.h"
 void setUp(void)
 {
 }
@@ -17,6 +18,7 @@ void tearDown(void)
 void test_asesemble_ADDshortPtr_ADD_A_0x10_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
+  char instruct[] = "   ADD A,[$10.W]" ;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"ADD"};
   IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"A"};
@@ -28,7 +30,7 @@ void test_asesemble_ADDshortPtr_ADD_A_0x10_expect_exception(void){
   IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE, 14,1,"W"};
   OperatorToken   SquareBracket2Token ={TOKEN_OPERATOR_TYPE, 15,1,"]"};
 
-  initTokenizer_ExpectAndReturn("   ADD A,[$10.w]",tokenizer);
+  initTokenizer_ExpectAndReturn(instruct,tokenizer);
   getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
@@ -39,7 +41,7 @@ void test_asesemble_ADDshortPtr_ADD_A_0x10_expect_exception(void){
   getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&SquareBracket2Token);
   Try {
-    machineCode = ADDShortPtr("   ADD A,[$10.w]");
+    machineCode = ADDShortPtr(instruct);
     printf("the instruction [   ADD A,[$10.w]       ] opcode is %#4x",machineCode);
   }Catch(ex) {
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
@@ -50,6 +52,7 @@ void test_asesemble_ADDshortPtr_ADD_A_0x10_expect_exception(void){
 void test_asesemble_ADDshortPtrX_ADD_A_0x10_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
+  char instruct[] = "   ADD A,([$10.W],X)" ;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"ADD"};
   IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"A"};
@@ -66,7 +69,7 @@ void test_asesemble_ADDshortPtrX_ADD_A_0x10_expect_exception(void){
   OperatorToken   NormalBracket2Token = {TOKEN_OPERATOR_TYPE, 19,1,")"};
 
 
-  initTokenizer_ExpectAndReturn("   ADD A,([$10.w],X)",tokenizer);
+  initTokenizer_ExpectAndReturn(instruct,tokenizer);
   getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
@@ -81,7 +84,7 @@ void test_asesemble_ADDshortPtrX_ADD_A_0x10_expect_exception(void){
   getToken_ExpectAndReturn(tokenizer, (Token *)&XToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&NormalBracket2Token);
   Try {
-    machineCode = ADDShortPtrXIndexFile("   ADD A,([$10.w],X)");
+    machineCode = ADDShortPtrXIndexFile(instruct);
     printf("the instruction [   ADD A,([$10.w],X)   ] opcode is %#4x",machineCode);
   }Catch(ex) {
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
@@ -94,6 +97,7 @@ void test_asesemble_ADDshortPtrX_ADD_A_0x10_expect_exception(void){
 void test_asesemble_ADDshortPtrY_ADD_A_0x10_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
+  char instruct[] = "   Add A,([$10.w],Y)";
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,3,"ADD"};
   IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE, 7,1,"A"};
@@ -110,7 +114,7 @@ void test_asesemble_ADDshortPtrY_ADD_A_0x10_expect_exception(void){
   OperatorToken   NormalBracket2Token = {TOKEN_OPERATOR_TYPE, 19,1,")"};
 
 
-  initTokenizer_ExpectAndReturn("   ADD A,([$10.w],Y)",tokenizer);
+  initTokenizer_ExpectAndReturn(instruct,tokenizer);
   getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
@@ -125,8 +129,8 @@ void test_asesemble_ADDshortPtrY_ADD_A_0x10_expect_exception(void){
   getToken_ExpectAndReturn(tokenizer, (Token *)&YToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&NormalBracket2Token);
   Try {
-    machineCode = ADDShortPtrYIndexFile("   ADD A,([$10.w],Y)");
-    printf("the instruction [   ADD A,([$10.w],Y)   ] opcode is %#4x",machineCode);
+    machineCode = ADDShortPtrYIndexFile(instruct);
+    printf("the instruction [   ADD A,([$10.W],Y)   ] opcode is %#4x",machineCode);
   }Catch(ex) {
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
   }

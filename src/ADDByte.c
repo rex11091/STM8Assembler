@@ -5,33 +5,14 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
+#include "touppercase.h"
+#include "symbol.h"
 
 
-
-
-
-char *convertToUpperCase(char *name)
-{
-  int i = 0;
-  char *buffer;
-  buffer = (char*)malloc(strlen(name)+1);
-  strcpy(buffer,name);
-  printf("before convertToUpperCase %s\n",buffer);
-  while(buffer[i] != '\0')
-  {
-    buffer[i] = toupper(buffer[i]);
-    ++i;
-  }
-  printf("after convertToUpperCase %s\n",buffer);
-  return buffer;
-  free(buffer);
-}
-
-
-int ADDByte(char *assemblyCode){
-  char *result;
- result = convertToUpperCase(assemblyCode);
- Tokenizer *tokenizer = initTokenizer(result);
+int ADDByte(char *instruct){
+ //char *result;
+ instruct = convertToUpperCase(instruct);
+ Tokenizer *tokenizer = initTokenizer(instruct);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
  IntegerToken *intToken;
@@ -46,7 +27,8 @@ int ADDByte(char *assemblyCode){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
-                if(strcmp(opToken->str, ",") == 0){
+              //  if(strcmp(opToken->str, ",") == 0){
+              if(commasymbol(opToken->str)== 0){
                   token = getToken(tokenizer);
                   if(token->type == TOKEN_OPERATOR_TYPE){
                     opToken = (OperatorToken *)token;

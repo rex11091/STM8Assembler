@@ -5,9 +5,10 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
-
+#include "touppercase.h"
 
 int ADDLongPtr(char *assemblyCode){
+  assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -15,11 +16,11 @@ int ADDLongPtr(char *assemblyCode){
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
+	    if(strcmp(idToken->str, "ADD") == 0){
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
@@ -48,7 +49,7 @@ int ADDLongPtr(char *assemblyCode){
                        token = getToken(tokenizer);
                       if(token->type == TOKEN_IDENTIFIER_TYPE){
                         idToken = (IdentifierToken *)token;
-                        if((strcmp(idToken->str, "W") == 0) || (strcmp(idToken->str, "w") == 0)){
+                        if(strcmp(idToken->str, "W") == 0){
                            token = getToken(tokenizer);
                             if(token->type == TOKEN_OPERATOR_TYPE){
                                opToken = (OperatorToken *)token;
@@ -103,6 +104,7 @@ int ADDLongPtr(char *assemblyCode){
 }
 
 int ADDLongPtrXIndexFile(char *assemblyCode){
+  assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -110,11 +112,11 @@ int ADDLongPtrXIndexFile(char *assemblyCode){
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)){
+	    if(strcmp(idToken->str, "ADD") == 0){
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
@@ -147,7 +149,7 @@ int ADDLongPtrXIndexFile(char *assemblyCode){
                        token = getToken(tokenizer);
                       if(token->type == TOKEN_IDENTIFIER_TYPE){
                         idToken = (IdentifierToken *)token;
-                      if((strcmp(idToken->str, "W") == 0) || (strcmp(idToken->str, "w") == 0)){
+                      if(strcmp(idToken->str, "W") == 0){
                            token = getToken(tokenizer);
                             if(token->type == TOKEN_OPERATOR_TYPE){
                                opToken = (OperatorToken *)token;
@@ -161,7 +163,7 @@ int ADDLongPtrXIndexFile(char *assemblyCode){
                                        token = getToken(tokenizer);
                                       if(token->type == TOKEN_IDENTIFIER_TYPE){
                                         idToken = (IdentifierToken *)token;
-                                        if((strcmp(idToken->str, "X") == 0) || (strcmp(idToken->str, "x") == 0)){
+                                        if(strcmp(idToken->str, "X") == 0){
 
                                           token = getToken(tokenizer);
                                            if(token->type == TOKEN_OPERATOR_TYPE){

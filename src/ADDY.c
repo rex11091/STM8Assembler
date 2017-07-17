@@ -5,9 +5,11 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
+#include "touppercase.h"
 
 
 int ADDY(char *assemblyCode){
+assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;

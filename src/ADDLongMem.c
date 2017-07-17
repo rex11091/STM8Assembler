@@ -5,9 +5,11 @@
 #include "Token.h"
 #include "error.h"
 #include "CException.h"
+#include "touppercase.h"
 
 
 int ADDLongMem(char *assemblyCode){
+ assemblyCode = convertToUpperCase(assemblyCode);
  Tokenizer *tokenizer = initTokenizer(assemblyCode);
  Token *token = getToken(tokenizer);
  IdentifierToken *idToken;
@@ -15,11 +17,11 @@ int ADDLongMem(char *assemblyCode){
  OperatorToken *opToken;
   if(token->type == TOKEN_IDENTIFIER_TYPE){
 	   idToken = (IdentifierToken *)token;
-	    if((strcmp(idToken->str, "ADD") == 0) || (strcmp(idToken->str, "add") == 0)) {
+	    if(strcmp(idToken->str, "ADD") == 0) {
         token = getToken(tokenizer);
         if(token->type == TOKEN_IDENTIFIER_TYPE){
           idToken = (IdentifierToken *)token;
-          if((strcmp(idToken->str, "A") == 0) || (strcmp(idToken->str, "a") == 0)){
+          if(strcmp(idToken->str, "A") == 0){
             token = getToken(tokenizer);
               if(token->type == TOKEN_OPERATOR_TYPE){
                 opToken = (OperatorToken *)token;
