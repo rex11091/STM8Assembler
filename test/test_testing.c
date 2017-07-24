@@ -6,7 +6,7 @@
 #include "error.h"
 #include "Exception.h"
 #include "touppercase.h"
-#include "symbol.h"
+
 void setUp(void)
 {
 }
@@ -16,10 +16,32 @@ void tearDown(void)
 }
 
 
+void test_asesemble_HEXorDEcimal_expect_exception(void){
+  CEXCEPTION_T ex;
+  int machineCode;
+  //uint8_t buffer[16];
+  char instruct[]= "$25";
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE,0,1,"$"};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,2,"25",25};
+
+
+  initTokenizer_ExpectAndReturn(instruct,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+  Try {
+    machineCode = hexaOrDecimal(instruct);
+  }Catch(ex) {
+    TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
+  }
+}
 
 
 
-void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
+
+
+/*void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
   CEXCEPTION_T ex;
   int machineCode;
   uint8_t buffer[16];
@@ -44,3 +66,4 @@ void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
     TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
   }
 }
+*/
