@@ -9,7 +9,16 @@
 #include "symbol.h"
 
 
-int ADDByte(char *instruct){
+
+
+FuncPtr SyntaxOperand[256]= {
+  ['#'] = {byteOperand},
+  //['$'] = LongShortMemOperand,
+};
+
+
+
+int ADDByte(char *instruct,uint8_t codeMem[]){
  //char *result;
  instruct = convertToUpperCase(instruct);
  Tokenizer *tokenizer = initTokenizer(instruct);
@@ -17,49 +26,42 @@ int ADDByte(char *instruct){
  IdentifierToken *idToken;
  IntegerToken *intToken;
  OperatorToken *opToken;
-                  if(token->type == TOKEN_IDENTIFIER_TYPE){
-	                idToken = (IdentifierToken *)token;
-	                if(strcmp(idToken->str, "ADD A ,") == 0){
-                //  token = getToken(tokenizer);
-                //  if(token->type == TOKEN_IDENTIFIER_TYPE){
-                //  idToken = (IdentifierToken *)token;
-                //  if(AInstruction(idToken->str) == 0);
-                //  token = getToken(tokenizer);
-                //  if(token->type == TOKEN_OPERATOR_TYPE){
-                //  opToken = (OperatorToken *)token;
-                //  if(commasymbol(opToken->str) == 0);
-                  token = getToken(tokenizer);
-                  if(token->type == TOKEN_OPERATOR_TYPE){
-                  opToken = (OperatorToken *)token;
-                  if(HashTagsymbol(opToken->str) == 0);
-                  token = getToken(tokenizer);
-                  if(token->type == TOKEN_OPERATOR_TYPE){
-                  opToken = (OperatorToken *)token;
-                  if(dollarsymbol(opToken->str)== 0){
-		              token = getToken(tokenizer);
-		              if(token->type == TOKEN_INTEGER_TYPE){
-			            IntegerToken *intToken = (IntegerToken *)token;
-			            if(intToken->value > 0xff) {
-                    printf("Error: Limit exceeded: Allowed range is 0xffffffffffffff80 - 0xff (-128 - 255)\n");
-                    printf("ADD A,#$%d\n       ^", intToken->value);
-                           Throw(LIMIT_EXCEEDED);
-			            }
-                  return 0xAB00 + (intToken->value & 0xff);
-		              }else
-                  {
-			            Throw(NOT_VALID_OPERAND);
-		               }
-
-               }
-               }
-               }
-               }
-               }
-	             }
-               else
-               {
-                 Throw(NOT_VALID_INSTRUCTION);
-               }
-               }
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+	   idToken = (IdentifierToken *)token;
+	   if(strcmp(idToken->str, "ADD A ,") == 0){
+       token = getToken(tokenizer);
+         if(token->type == TOKEN_OPERATOR_TYPE){
+           opToken = (OperatorToken *)token;
+           SyntaxOperand[opToken->str[0]](tokenizer,codeMem);
 
 }
+}
+}
+}
+
+int byteOperand(Tokenizer *tokenizer,char *codeMem)
+{
+   Token *token = getToken(tokenizer);
+   OperatorToken *opToken;
+   IntegerToken *intToken;
+        if(token->type == TOKEN_OPERATOR_TYPE){
+        opToken = (OperatorToken *)token;
+        hexaOrDecimal(opToken->str);
+        token = getToken(tokenizer);
+        if(token->type == TOKEN_INTEGER_TYPE){
+        intToken = (IntegerToken *)token;
+        hexaNumber(intToken->value);
+        return 0x90FB;
+
+
+}
+}
+}
+
+
+
+
+//char* assembler (Tokenizer *tokenizer)
+//{
+//  SyntaxOperand[token].execute(token);
+//}
