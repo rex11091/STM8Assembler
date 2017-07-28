@@ -16,27 +16,32 @@ void tearDown(void)
 }
 
 
-void test_asesemble_HEXorDEcimal_expect_exception(void){
+void test_asesemble_given_adc_A_0x97_expect_0x97B9(void){
   CEXCEPTION_T ex;
-  int machineCode;
-  //uint8_t buffer[16];
-  char instruct[]= "$25";
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE,0,1,"$"};
-  IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,2,"25",25};
+  char *str = "adc A,$97";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"adc"};
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A"};
+	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,","};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$"};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"0x97",0x97};
 
 
-  initTokenizer_ExpectAndReturn(instruct,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+	initTokenizer_ExpectAndReturn(instruct,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
-  Try {
-    machineCode = hexaOrDecimal(instruct);
-  }Catch(ex) {
-    TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
-  }
+	Try {
+		assemble(str, &memoryToWriteCode);
+	}Catch(ex) {
+		TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
+	}
 }
-
 
 
 

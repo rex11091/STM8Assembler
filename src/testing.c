@@ -7,102 +7,71 @@
 #include "CException.h"
 #include "touppercase.h"
 
-
-
-
-
-//FuncPtr SyntaxOperand[256]= {
-//  ['#'] = {byteOperand},
-  //['$'] = LongShortMemOperand,
-//};
-
-int assemble(char *assemblyName, char **memoryToWriteCode);
-Tokenizer *tokenizer = initTokenizer(assemblyName);
-Token *token = getToken(tokenizer);
-IdentifierToken *idToken;
-OperatorToken *opToken;
-OperandInfo operandInfo;
-
-
-if(token->type != TOKEN_IDENTIFIER_TYPE)
-  Throw(NOT_VALID_INSTRUCTION);
-if(opToken->type != TOKEN_OPERATOR_TYPE && strcmp((",",opToken->str)==0)
-  Throw(NOT_VALID_OPERATOR);
-
-
-/*int hexaOrDecimal(char *instruct)
-{
-    Tokenizer *tokenizer = initTokenizer(instruct);
+void handleNEXTOperandMain(Tokenizer *tokenizedr,OperandInfo *operandInfo){
     Token *token = getToken(tokenizer);
-    IntegerToken *intToken;
-    if(token->type == TOKEN_INTEGER_TYPE){
-      intToken = (IntegerToken *)token;
-      if(strcmp(intToken->value,"$")==0){
-      printf("$ is detected is a hexa number\n");
-      token = getToken (tokenizer);
-        if(intToken->value >0xff)
-          {
-            printf("Error: Limit exceeded: Allowed range is 0xffffffffffffff80 - 0xff (-128 - 255)\n");
-            printf("value = %d\n",intToken->value);
-            Throw(LIMIT_EXCEEDED);
-          }
-        else if(intToken->value <=0xff)
-          {
-            printf("value = %d\n",intToken->value);
-          }
-        else
-          {
-            Throw(NOT_VALID_OPERAND);
-          }
-      return intToken->value;
-    }
-    else if(strcmp(intToken->value," ")==0){
-    printf("is a decimal number\n");
-    //token = getToken (tokenizer);
-      if(intToken->value >256)
-        {
-          printf("Error: Limit exceeded: Allowed range is 0xffffffffffffff80 - 0xff (-128 - 255)\n");
-          printf("value = %d\n",intToken->value);
-          Throw(LIMIT_EXCEEDED);
-        }
-      else if(intToken->value <=256)
-        {
-          printf("value = %d\n",intToken->value);
-        }
-      else
-        {
-          Throw(NOT_VALID_OPERAND);
-        }
-      return intToken->value;
-    }
+
+    if(token->type != TOKEN_INTEGER_TYPE)
+    Throw(NOT_VALID_OPERAND;
+
+    info->value = ((IntegerToken *)token->value);
+    if(info->value>0xff)
+    info->type = LONG_MEM;
     else
-    {
+    info->type = SHORT_MEM;
+}
+
+
+void  handleNEXTOperandMain(Tokenizer *tokenizedr,OperandInfo *operandInfo){
+    Token *token = getToken(tokenizer);
+
+    if(token->type != TOKEN_OPERATOR_TYPE)
     Throw(NOT_VALID_OPERATOR);
-    }
-
+    opToken = (OperatorToken *)token;
+    if((strcmp("$",opToken->str)==0)||(strcmp(" ",opToken->str)==0))
+    handleLongShortMem(tokenizedr,&OperandInfo);
   }
-}
-*/
 
-/*int ADDByte(char *instruct,uint8_t codeMem[]){
- //char *result;
- instruct = convertToUpperCase(instruct);
- Tokenizer *tokenizer = initTokenizer(instruct);
- Token *token = getToken(tokenizer);
- IdentifierToken *idToken;
- IntegerToken *intToken;
- OperatorToken *opToken;
-  if(token->type == TOKEN_IDENTIFIER_TYPE){
-	   idToken = (IdentifierToken *)token;
-	   if(strcmp(idToken->str, "ADD A ,") == 0){
-       token = getToken(tokenizer);
-         if(token->type == TOKEN_OPERATOR_TYPE){
-           opToken = (OperatorToken *)token;
-           SyntaxOperand[opToken->str[0]](tokenizer,codeMem);
+void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
+  uint8_t *code = *memoryToWriteCode;
+  switch (operandInfo->type) {
+    case LONG_MEM:
+    code[0] = OperandInfo->baseOpcode + 0xc0;
+    code[1] = (OperandInfo->value >> 8 )+ 0xff;
+    code[2] = OperandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+    case SHORT_MEM:
+    code[0] = OperandInfo->baseOpcode + 0xc0;
+    code[2] = OperandInfo->value & 0xff;
+    *memoryToWriteCode +=2;
+    break;
+
+    default:
+    Throw(ERR_SYNTAX)
+  }
+
+}
 
 
+int assemble(char *assemblyName, char **memoryToWriteCode){
+  Tokenizer tokenizer = initTokenizer(assemblyName);
+  IdentifierToken *idToken;
+  OperatorToken *opToken;
+  OperandInfo operandinfo;
+
+  if(token->type != TOKEN_IDENTIFIER_TYPE)
+    Throw(NOT_VALID_INSTRUCTION);
+  idtoken = (IdentifierToken *)token;
+  token   = getToken(tokenizer);
+  if(token->type != TOKEN_IDENTIFIER_TYPE)
+  Throw(NOT_VALID_INSTRUCTION);
+//idtoken = (IdentifierToken *)token;
+  opToken = (OperatorToken *)getToken(token);
+  if(opToken->type != TOKEN_OPERATOR_TYPE && (strcmp(",",optoken->str )==0))
+  Throw(NOT_VALID_OPERATOR);
+  handleNEXTOperandMain(tokenizedr,&operandInfo);
+
+  printf(" sadsadsad");
+  displayOpcode(memoryToWriteCode,operandInfo);
+
 }
-}
-}
-}
-*/
