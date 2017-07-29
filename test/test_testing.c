@@ -15,7 +15,7 @@ void tearDown(void)
 {
 }
 
-
+/*
 void test_asesemble_given_adc_A_0x97_expect_0x97B9(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
@@ -26,49 +26,41 @@ void test_asesemble_given_adc_A_0x97_expect_0x97B9(void){
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A"};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,","};
 	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$"};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"0x97",0x97};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"97",97};
 
 
-	initTokenizer_ExpectAndReturn(instruct,tokenizer);
+	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
+ printf("%d",*(uint32_t *)buffer);
 	Try {
 		assemble(str, &memoryToWriteCode);
+    //printf("%d",*(uint32_t *)buffer);
 	}Catch(ex) {
 		TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
 	}
 }
-
-
-
-
-/*void test_asesemble_ADDByte_ADD_A_50_expect_exception(void){
-  CEXCEPTION_T ex;
-  int machineCode;
-  uint8_t buffer[16];
-  char instruct[]= "   AdD a,# 25";
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 3,6,"ADD A ,"};
-  OperatorToken   HashTagToken ={TOKEN_OPERATOR_TYPE, 9,1,"#"};
-  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 10,1,"$"};
-  IntegerToken intToken = {TOKEN_INTEGER_TYPE,11,3,"25",25};
-
-
-  initTokenizer_ExpectAndReturn(instruct,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&HashTagToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
-
-  Try {
-    machineCode = ADDByte(instruct,buffer);
-    printf("the instruction [    %s    ] opcode is %#4x",instruct,machineCode);
-  }Catch(ex) {
-    TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
-  }
-}
 */
+
+void test_asesemble_given_0x97_expect_exception(void){
+CEXCEPTION_T ex;
+OperandInfo operandInfo;
+operandInfo.value = 0x97;
+Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+//operandInfo *operandInfo;
+char *str = "97";
+IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"97",97};
+
+initTokenizer_ExpectAndReturn(str,tokenizer);
+getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+Try {
+handleLongShortMem(tokenizer,&operandInfo);
+   }Catch(ex) {
+  TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
+}
+}

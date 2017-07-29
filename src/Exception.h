@@ -1,7 +1,7 @@
 
 #ifndef Exception_H
 #define Exception_H
-
+#include "error.h"
 typedef struct Exception Exception;
 typedef struct Exception* ExceptionPtr;
 struct Exception {

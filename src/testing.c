@@ -7,71 +7,90 @@
 #include "CException.h"
 #include "touppercase.h"
 
-void handleNEXTOperandMain(Tokenizer *tokenizedr,OperandInfo *operandInfo){
+void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo){
     Token *token = getToken(tokenizer);
-
-    if(token->type != TOKEN_INTEGER_TYPE)
-    Throw(NOT_VALID_OPERAND;
-
-    info->value = ((IntegerToken *)token->value);
-    if(info->value>0xff)
-    info->type = LONG_MEM;
+    if(token->type == TOKEN_INTEGER_TYPE){
+    operandInfo->value = ((IntegerToken *)token)->value;
+    if(operandInfo->value > 0xff){
+    operandInfo->type = LONG_MEM;
+    }
+    else{
+    operandInfo->type = SHORT_MEM;
+    }
+    }
     else
-    info->type = SHORT_MEM;
+   Throw(NOT_VALID_OPERAND);
+
 }
 
 
-void  handleNEXTOperandMain(Tokenizer *tokenizedr,OperandInfo *operandInfo){
+void  handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
+    OperatorToken *opToken;
     Token *token = getToken(tokenizer);
-
-    if(token->type != TOKEN_OPERATOR_TYPE)
-    Throw(NOT_VALID_OPERATOR);
+    if(token->type == TOKEN_OPERATOR_TYPE)
+    {
     opToken = (OperatorToken *)token;
     if((strcmp("$",opToken->str)==0)||(strcmp(" ",opToken->str)==0))
-    handleLongShortMem(tokenizedr,&OperandInfo);
+    handleLongShortMem(tokenizer,&operandInfo);
+    else
+    Throw(NOT_VALID_OPERATOR);
+    }
+    else
+    Throw(NOT_VALID_OPERATOR);
   }
 
 void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
   uint8_t *code = *memoryToWriteCode;
   switch (operandInfo->type) {
     case LONG_MEM:
-    code[0] = OperandInfo->baseOpcode + 0xc0;
-    code[1] = (OperandInfo->value >> 8 )+ 0xff;
-    code[2] = OperandInfo->value & 0xff;
+    code[0] = operandInfo->baseOpcode + 0xc0;
+    code[1] = (operandInfo->value >> 8 )+ 0xff;
+    code[2] = operandInfo->value & 0xff;
     *memoryToWriteCode +=3;
     break;
     case SHORT_MEM:
-    code[0] = OperandInfo->baseOpcode + 0xc0;
-    code[2] = OperandInfo->value & 0xff;
+    code[0] = operandInfo->baseOpcode + 0xc0;
+    code[2] = operandInfo->value & 0xff;
     *memoryToWriteCode +=2;
     break;
 
     default:
-    Throw(ERR_SYNTAX)
+    Throw(ERR_SYNTAX);
   }
 
 }
 
-
+/*this function is get the 1st 3 token to identify them
+  such as ADD A, ADC A, SUB A,
+*/
 int assemble(char *assemblyName, char **memoryToWriteCode){
-  Tokenizer tokenizer = initTokenizer(assemblyName);
+  Tokenizer *tokenizer = initTokenizer(assemblyName);
+  Token *token = getToken(tokenizer);
   IdentifierToken *idToken;
   OperatorToken *opToken;
-  OperandInfo operandinfo;
-
-  if(token->type != TOKEN_IDENTIFIER_TYPE)
-    Throw(NOT_VALID_INSTRUCTION);
-  idtoken = (IdentifierToken *)token;
-  token   = getToken(tokenizer);
-  if(token->type != TOKEN_IDENTIFIER_TYPE)
+  OperandInfo operandInfo;
+  //1st token
+  if(token->type == TOKEN_IDENTIFIER_TYPE)
+  idToken = (IdentifierToken *)token;
+  else
   Throw(NOT_VALID_INSTRUCTION);
-//idtoken = (IdentifierToken *)token;
-  opToken = (OperatorToken *)getToken(token);
-  if(opToken->type != TOKEN_OPERATOR_TYPE && (strcmp(",",optoken->str )==0))
+  //2nd token
+  token   = getToken(tokenizer);
+  if(token->type == TOKEN_IDENTIFIER_TYPE)
+  idToken = (IdentifierToken *)token;
+  else
+  Throw(NOT_VALID_INSTRUCTION);
+  //3rd token
+  opToken = (OperatorToken *)getToken(tokenizer);
+  if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0))
+  {
+  handleNEXTOperandMain(tokenizer,&operandInfo);
+  displayOpcode(memoryToWriteCode,&operandInfo);
+  }
+  else
   Throw(NOT_VALID_OPERATOR);
-  handleNEXTOperandMain(tokenizedr,&operandInfo);
+  //handleNEXTOperandMain(tokenizer,OperandInfo *operandInfo)
 
-  printf(" sadsadsad");
-  displayOpcode(memoryToWriteCode,operandInfo);
+
 
 }
