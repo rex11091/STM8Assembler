@@ -8,8 +8,7 @@
 #include "Tokenizer.h"
 #include "Token.h"
 
-
-typedef enum  {
+typedef enum{
   LONG_MEM,
   SHORT_MEM,
 }OperandType;
@@ -20,7 +19,7 @@ struct OperandInfo{
   int baseOpcode;
   int value;
 };
-
+void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 
 

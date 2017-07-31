@@ -9,18 +9,21 @@
 
 void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo){
     Token *token = getToken(tokenizer);
-    if(token->type == TOKEN_INTEGER_TYPE){
-    operandInfo->value = ((IntegerToken *)token)->value;
-    if(operandInfo->value > 0xff){
-    operandInfo->type = LONG_MEM;
-    }
-    else{
-    operandInfo->type = SHORT_MEM;
-    }
+    if(token->type == TOKEN_INTEGER_TYPE)
+    {
+      operandInfo->value = ((IntegerToken *)token)->value;
+      if(operandInfo->value > 0xff){
+      operandInfo->type = LONG_MEM; // 0
+      printf("%d\n",operandInfo->type);
+      printf("%d\n",operandInfo->value);
+      }
+      else{
+      operandInfo->type = SHORT_MEM; // 1
+    //  printf("%d\n",operandInfo->type);
+      }
     }
     else
-   Throw(NOT_VALID_OPERAND);
-
+    Throw(NOT_VALID_OPERAND);
 }
 
 
@@ -31,7 +34,7 @@ void  handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
     {
     opToken = (OperatorToken *)token;
     if((strcmp("$",opToken->str)==0)||(strcmp(" ",opToken->str)==0))
-    handleLongShortMem(tokenizer,&operandInfo);
+    handleLongShortMem(tokenizer,operandInfo);
     else
     Throw(NOT_VALID_OPERATOR);
     }
@@ -41,16 +44,21 @@ void  handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
 
 void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
   uint8_t *code = *memoryToWriteCode;
+  printf("%d\n",operandInfo->type);
   switch (operandInfo->type) {
     case LONG_MEM:
-    code[0] = operandInfo->baseOpcode + 0xc0;
+    code[0] = operandInfo->baseOpcode + 0xB0;
+    printf("%d\n",code[0]);
     code[1] = (operandInfo->value >> 8 )+ 0xff;
+    printf("%d\n",code[1]);
     code[2] = operandInfo->value & 0xff;
     *memoryToWriteCode +=3;
     break;
     case SHORT_MEM:
-    code[0] = operandInfo->baseOpcode + 0xc0;
-    code[2] = operandInfo->value & 0xff;
+    code[0] = operandInfo->baseOpcode + 0xB0;
+    printf("%d\n",code[0]);
+    code[1] = operandInfo->value & 0xff;
+    printf("%d\n",code[1]);
     *memoryToWriteCode +=2;
     break;
 
@@ -85,6 +93,7 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
   if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0))
   {
   handleNEXTOperandMain(tokenizer,&operandInfo);
+  operandInfo.baseOpcode=0x09;
   displayOpcode(memoryToWriteCode,&operandInfo);
   }
   else
