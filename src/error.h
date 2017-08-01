@@ -7,4 +7,5 @@
 #define EXTRA_OPERAND 48
 #define LIMIT_EXCEEDED 49
 #define ERR_SYNTAX  50
+#define NOT_VALID_OPREANDINFO_TYPE 51
 #endif // _ERROR_H
