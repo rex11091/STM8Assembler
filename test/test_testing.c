@@ -14,8 +14,8 @@ void setUp(void)
 void tearDown(void)
 {
 }
-/*
-void xtest_function_handleIndexXandY_given_XorY_expect_exception(void){
+
+void test_function_handleIndexXandY_given_XorY_expect_exception(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -29,10 +29,10 @@ void xtest_function_handleIndexXandY_given_XorY_expect_exception(void){
   		handleIndexXandY(tokenizer, &operandInfo);
       printf("%d\n",operandInfo.type);
   	}Catch(ex) {
-  	TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
+  	  dumpException(ex);
   	}
+    freeException(ex);
   }
-*/
 
 void xtest_function_convert_ShortOff_to_LongOFF_given_Shortoff_expect_Longoff(void){
     CEXCEPTION_T ex;

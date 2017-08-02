@@ -6,9 +6,10 @@
 #include "error.h"
 #include "CException.h"
 #include "touppercase.h"
+#include "Exception.h"
 
 
-/*
+
 void handleIndexXandY(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IdentifierToken *idToken;
     OperatorToken *opToken;
@@ -21,16 +22,18 @@ void handleIndexXandY(Tokenizer *tokenizer,OperandInfo *operandInfo){
         else if(strcmp(idToken->str,"Y")==0)
           operandInfo->type = IndexY;
         else
-          Throw(NOT_VALID_INSTRUCTION);
+        throwException(NOT_VALID_INSTRUCTION,                                     \
+                       "Invalid operand, expecting a ',', but received '%s'\n", \
+                        idToken->str);
     }
-    else
-    Throw(NOT_VALID_INSTRUCTION);
 
     opToken = (OperatorToken *)getToken(tokenizer);
     if(opToken->type != TOKEN_OPERATOR_TYPE || (strcmp(")",opToken->str )!=0))
-    Throw(NOT_VALID_OPERATOR);
+    throwException(NOT_VALID_OPERATOR,                                     \
+                   "Invalid operand, expecting a ',', but received '%s'\n", \
+                    opToken->str);
 }
-*/
+
 
 
 
