@@ -19,6 +19,13 @@ typedef enum{
   LONGOFF_X,
   LONGOFF_Y,
   SHORTOFF_SP,
+  SHORTPTR,
+  LONGPTR,
+  SHORTPTR_X,
+  SHORTPTR_Y,
+  LONGPTR_X,
+  Long,
+  Short,
 }OperandType;
 
 typedef struct OperandInfo OperandInfo;
