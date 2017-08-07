@@ -34,8 +34,22 @@ struct OperandInfo{
   int baseOpcode;
   int value;
 };
+void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void getCloseBracketSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void gettokenDotWBracket(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleShortLongPtr(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void convertShortoffToLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleShortLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleByte(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
+void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 
+#define isTokenMatchesString(token,str2cmp)  (strcmp(token,str2cmp )== 0)
 
 #endif // _TESTING_H

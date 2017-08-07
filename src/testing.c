@@ -8,7 +8,6 @@
 #include "touppercase.h"
 #include "Exception.h"
 
-
 /*
 void handleIndexXandY(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IdentifierToken *idToken;
@@ -57,9 +56,9 @@ void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
     {
       operandInfo->value = intToken->value;
       if(operandInfo->value < 0xff || operandInfo->value < 256)
-      operandInfo->type = Short; // 1
-      else if(operandInfo->value < 0xffff || operandInfo->value < 65535)
-      operandInfo->type = Long; // 0
+        operandInfo->type = Short; // 1
+      else if(operandInfo->value < 0xffff || operandInfo->value < 65536)
+        operandInfo->type = Long; // 0
       else{
         Throw(NOT_VALID_OPERAND);
           }
@@ -71,8 +70,9 @@ void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
 void getCloseBracketSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo){
   OperatorToken   *opToken;
   opToken = (OperatorToken *)getToken(tokenizer);
-  if(opToken->type !=TOKEN_OPERATOR_TYPE ||(strcmp(opToken->str,")") !=0))
-    throwException(NOT_VALID_OPERATOR,                                 \
+  if(opToken->type !=TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,")") !=0))
+  Throw(NOT_VALID_OPERATOR);
+  //  throwException(NOT_VALID_OPERATOR,                                 \
                  "Invalid operand, expecting a ')', but received '%s'\n", \
                   opToken->str);
 }
@@ -83,15 +83,15 @@ void gettokenDotWBracket(Tokenizer *tokenizer,OperandInfo *operandInfo){
 
   opToken = (OperatorToken *)getToken(tokenizer);
     if(opToken->type ==TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,".") ==0)){
-      idToken = (IdentifierToken *)getToken(tokenizer);
-        if(idToken->type ==TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"W") ==0)){
-          opToken = (OperatorToken *)getToken(tokenizer);
-            if(opToken->type !=TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,"]") !=0)){
-              Throw(NOT_VALID_OPERATOR);
-            }
-        }
-        else
-        Throw(NOT_VALID_INSTRUCTION);
+  idToken = (IdentifierToken *)getToken(tokenizer);
+    if(idToken->type ==TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"W") ==0)){
+  opToken = (OperatorToken *)getToken(tokenizer);
+    if(opToken->type !=TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,"]") !=0)){
+        Throw(NOT_VALID_OPERATOR);
+      }
+    }
+    else
+    Throw(NOT_VALID_IDENTIFIER);
     }
     else
     Throw(NOT_VALID_OPERATOR);
@@ -101,26 +101,29 @@ void gettokenDotWBracket(Tokenizer *tokenizer,OperandInfo *operandInfo){
  -----long/shortPtr-----
  *start with handleShortLongPtr
  *then determine either long or short through function getLongShortType
+ *convert long/short to long/short pointer by function convertLongShortptrType;
  *get following operand by getCloseBracketSymbol
  ----long/shortPtr With index---
  *start with function handleShortLongPtr because have same content
- *convert the operandInfo.type in function itself
+ *convert the operandInfo.type in function handleShortLongPtr
  *get bracket from getCloseBracketSymbol
 */
-
+void convertShortLongPtrType(Tokenizer *tokenizer,OperandInfo *operandInfo){
+  if(operandInfo->type == Long)
+    operandInfo->type = LONGPTR;
+  else if(operandInfo->type == Short)
+    operandInfo->type = SHORTPTR;
+  else
+   Throw(NOT_VALID_OPREANDINFO_TYPE);
+}
 void handleShortLongPtr(Tokenizer *tokenizer,OperandInfo *operandInfo){
   OperatorToken   *opToken;
   opToken = (OperatorToken *)getToken(tokenizer);
     if(opToken->type ==TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,"$") ==0)){
-       getLongShortType(tokenizer,operandInfo);
-            if(operandInfo->type == Long)
-              operandInfo->type = LONGPTR;
-            else if(operandInfo->type == Short)
-              operandInfo->type = SHORTPTR;
+      getLongShortType(tokenizer,operandInfo);
+      convertShortLongPtrType(tokenizer,operandInfo);
       gettokenDotWBracket(tokenizer,operandInfo);
-    }
-  else
-  Throw(NOT_VALID_OPERATOR);
+      }
 }
 void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IdentifierToken *idToken;
@@ -142,6 +145,8 @@ void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo
               else if(operandInfo->type == LONGPTR)
                 Throw(NOT_VALID_OPREANDINFO_TYPE);
             }
+            else
+              Throw(NOT_VALID_IDENTIFIER);
           }
           getCloseBracketSymbol(tokenizer,operandInfo);
       }
@@ -153,13 +158,12 @@ void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo
 -then x,y,sp from function getShortlongoffIndexX_Y_SP
 -use convertShortoffToLongoff function if needed
 */
-// have problem with the Exception
 void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo){
   IdentifierToken *idToken;
   OperatorToken   *opToken;
   opToken = (OperatorToken *)getToken(tokenizer);
     if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,",")==0)){
-      idToken = (IdentifierToken *)getToken(tokenizer);
+  idToken = (IdentifierToken *)getToken(tokenizer);
     if(idToken->type == TOKEN_IDENTIFIER_TYPE)
       if(strcmp(idToken->str,"X")==0)
         operandInfo->type = SHORTOFF_X;
@@ -168,13 +172,9 @@ void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo){
       else if(strcmp(idToken->str,"SP")==0)
         operandInfo->type = SHORTOFF_SP;
       else
-        throwException(NOT_VALID_OPREANDINFO_TYPE,                               \
-                     "Invalid operand, expecting a 'short off X(5),Y(6) or SP(9)', but received '%d'\n",\
-                      operandInfo->type);
+        Throw(NOT_VALID_IDENTIFIER);
   }else
-  throwException(NOT_VALID_OPERATOR,                                     \
-                 "Invalid operand, expecting a ',', but received '%s'\n", \
-                  opToken->str);
+  Throw(NOT_VALID_OPERATOR);
 
 }
 
@@ -236,7 +236,7 @@ void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo){
          operandInfo->type = SHORT_MEM;
 }
 
-void handleINExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
+void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
   IdentifierToken *idToken;
   OperatorToken *opToken;
   Token *token = getToken(tokenizer);
@@ -255,11 +255,11 @@ void handleINExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
         {
         opToken = (OperatorToken *)token;
         if(strcmp(opToken->str,"$")==0)
-        handleShortLongoff(tokenizer,operandInfo);
+          handleShortLongoff(tokenizer,operandInfo);
         else if(strcmp(opToken->str,"[")==0)
-        handleShortLongPtrorWithIndex(tokenizer,operandInfo);
+          handleShortLongPtrorWithIndex(tokenizer,operandInfo);
         else
-        Throw(NOT_VALID_OPERATOR);
+          Throw(NOT_VALID_OPERATOR);
         }
     else
       Throw(ERR_SYNTAX);
@@ -276,7 +276,7 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
       else if((strcmp("#",opToken->str)==0))
         handleByte(tokenizer,operandInfo);
       else if((strcmp("(",opToken->str)==0)){
-        handleINExt_2_OperandMain(tokenizer,operandInfo);
+        handleNExt_2_OperandMain(tokenizer,operandInfo);
       }
       else if((strcmp("[",opToken->str)==0)){
         handleShortLongPtr(tokenizer,operandInfo);
@@ -397,36 +397,48 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
 
 }
 
+void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo){
+    if(isTokenMatchesString(instructionTocompare,"ADC"))
+      operandInfo->baseOpcode = 0x09;
+    else if(isTokenMatchesString(instructionTocompare,"ADD"))
+      operandInfo->baseOpcode = 0x0B;
+    else if(isTokenMatchesString(instructionTocompare,"AND"))
+      operandInfo->baseOpcode = 0x04;
+    else
+    Throw(NOT_VALID_INSTRUCTION);
+}
+
 /*this function is get the 1st 3 token to identify them
-  such as ADD A, ADC A, SUB A,
+  use function identifyInstruction to change the baseOpcode
+  such as ADD A, ADC A, SUB A, have different baseOpcode
 */
 int assemble(char *assemblyName, char **memoryToWriteCode){
+  assemblyName = convertToUpperCase(assemblyName);
   Tokenizer *tokenizer = initTokenizer(assemblyName);
   Token *token = getToken(tokenizer);
   IdentifierToken *idToken;
   OperatorToken *opToken;
   OperandInfo operandInfo;
   //1st token
-  if(token->type == TOKEN_IDENTIFIER_TYPE)
-  idToken = (IdentifierToken *)token;
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+    idToken = (IdentifierToken *)token;
+    identifyInstruction(idToken->str,&operandInfo);
+  }
   else
-  Throw(NOT_VALID_INSTRUCTION);
+    Throw(NOT_VALID_INSTRUCTION);
   //2nd token
   token   = getToken(tokenizer);
   if(token->type == TOKEN_IDENTIFIER_TYPE)
-  idToken = (IdentifierToken *)token;
+    idToken = (IdentifierToken *)token;
   else
-  Throw(NOT_VALID_INSTRUCTION);
+    Throw(NOT_VALID_IDENTIFIER);
   //3rd token
   opToken = (OperatorToken *)getToken(tokenizer);
   if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0))
   {
-  handleNEXTOperandMain(tokenizer,&operandInfo);
-  operandInfo.baseOpcode=0x09;
-  displayOpcode(memoryToWriteCode,&operandInfo);
+    handleNEXTOperandMain(tokenizer,&operandInfo);
+    displayOpcode(memoryToWriteCode,&operandInfo);
   }
   else
-  Throw(NOT_VALID_OPERATOR);
-  //handleNEXTOperandMain(tokenizer,OperandInfo *operandInfo)
-
+    Throw(NOT_VALID_OPERATOR);
 }
