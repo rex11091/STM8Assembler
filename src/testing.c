@@ -55,12 +55,12 @@ void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
     if(intToken->type == TOKEN_INTEGER_TYPE)
     {
       operandInfo->value = intToken->value;
-      if(operandInfo->value < 0xff || operandInfo->value < 256)
+      if(operandInfo->value <=0xff)
         operandInfo->type = Short; // 1
-      else if(operandInfo->value < 0xffff || operandInfo->value < 65536)
+      else if(operandInfo->value <=0xffff)
         operandInfo->type = Long; // 0
       else{
-        Throw(NOT_VALID_OPERAND);
+        Throw(LIMIT_EXCEEDED);
           }
     }
     else
@@ -157,6 +157,7 @@ void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo
 -start with handleShortLongoff
 -then x,y,sp from function getShortlongoffIndexX_Y_SP
 -use convertShortoffToLongoff function if needed
+-get CloseBracket from getCloseBracketSymbol
 */
 void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo){
   IdentifierToken *idToken;
@@ -177,7 +178,6 @@ void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo){
   Throw(NOT_VALID_OPERATOR);
 
 }
-
 void convertShortoffToLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo){
   if(operandInfo->type == SHORTOFF_X)
     operandInfo->type = LONGOFF_X;
@@ -188,7 +188,6 @@ void convertShortoffToLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo){
   else
     Throw(NOT_VALID_OPREANDINFO_TYPE);
 }
-
 void handleShortLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo){
   OperatorToken *opToken;
   IntegerToken *intToken;
@@ -196,15 +195,17 @@ void handleShortLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo){
   if(token->type == TOKEN_INTEGER_TYPE)
   {
     operandInfo->value = ((IntegerToken *)token)->value;
-    if(operandInfo->value < 0xff || operandInfo->value < 256){
+    if(operandInfo->value <= 0xff){
       getShortlongoffIndexX_Y_SP(tokenizer,operandInfo);
       getCloseBracketSymbol(tokenizer,operandInfo);
     }
-    else if(operandInfo->value < 0xffff || operandInfo->value < 65535){
+    else if(operandInfo->value <= 0xffff){
       getShortlongoffIndexX_Y_SP(tokenizer,operandInfo);
       convertShortoffToLongoff(tokenizer,operandInfo);
       getCloseBracketSymbol(tokenizer,operandInfo);
     }
+    else
+    Throw(LIMIT_EXCEEDED);
   }
 }
 
@@ -217,10 +218,11 @@ void handleByte(Tokenizer *tokenizer,OperandInfo *operandInfo){
         token = getToken(tokenizer);
           if(token->type == TOKEN_INTEGER_TYPE){
             operandInfo->value = ((IntegerToken *)token)->value;
-              if(operandInfo->value < 0xff || operandInfo->value < 256)
+              if(operandInfo->value <= 0xff)
                 operandInfo->type = BYTE; // 0
               else
-                Throw(NOT_VALID_OPERAND);}
+                Throw(LIMIT_EXCEEDED);
+              }
           else
             Throw(NOT_VALID_OPERATOR);
           }
@@ -290,7 +292,7 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
 
 void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
   uint8_t *code = *memoryToWriteCode;
-  printf("%d\n",operandInfo->type);
+//  printf("%d\n",operandInfo->type);
   switch (operandInfo->type) {
     case LONG_MEM:
     code[0] = operandInfo->baseOpcode + 0xC0;

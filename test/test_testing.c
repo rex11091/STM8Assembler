@@ -74,13 +74,13 @@ void test_function_getlongshortType_given_65535_ffff_expect_long_15(void){
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
-    IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,5,"65535",65535};
+    IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,6,"0xffff",0xffff};
     getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
     getLongShortType(tokenizer, &operandInfo);
     TEST_ASSERT_EQUAL(15,operandInfo.type);
 }
-void test_function_getlongshortType_given_0x9797f__expect_Exception_Not_valid_operand(void){
+void test_function_getlongshortType_given_0x9797f_expect_Exception_limit_exceeded(void){
   CEXCEPTION_T ex;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -91,7 +91,7 @@ void test_function_getlongshortType_given_0x9797f__expect_Exception_Not_valid_op
   Try {
       getLongShortType(tokenizer, &operandInfo);
       }Catch(ex) {
-      TEST_ASSERT_EQUAL(NOT_VALID_OPERAND, ex);
+      TEST_ASSERT_EQUAL(LIMIT_EXCEEDED, ex);
       }
 }
 
@@ -291,7 +291,7 @@ void test_function_handleshorlongtptr_use_comma_represent_dollar_expect_Exceptio
   ------test function handleShortLongPtrorWithIndex---------
   *test change the index to another alphabert
   *test change the comma symbol to dollarToken
-  *test get LONGPTR/SHORTPTR/SHORTPTR_X/SHORTPTR_Y/LONGPTR_X
+  *test get SHORTPTR_X/SHORTPTR_Y/LONGPTR_X by convert it from SHORTPTR/LONGPTR
   *test given LONGPTR_Y but get Exception cause not LONGPTR_Y
   *others test has been done previous
 */
@@ -452,40 +452,116 @@ void test_function_handleShortLongPtrorWithIndex_given_0x1000_Y_expect_Not_valid
       }
 }
 
-void test_function_convert_ShortOff_to_LongOFF_given_Shortoff_expect_Longoff(void){
-    CEXCEPTION_T ex;
+//test function getShortlongoffIndexX_Y_SP
+void test_function_getShortLongoffIndexX_Y_SP_given__Y_expect_Shortoff_Y(void){
     OperandInfo operandInfo;
-    operandInfo.type = SHORTOFF_X;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
-  	Try {
-  		convertShortoffToLongoff(tokenizer, &operandInfo);
-      printf("%d\n",operandInfo.type);
-  	}Catch(ex) {
-  	TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
-  	}
-  }
-void test_function_getShortLongoffIndexX_Y_SP_given_XorY_SP_expect_No_exception(void){
-    CEXCEPTION_T ex;
+    OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
+    IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"Y"};
+    getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+    getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
+
+  	getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(SHORTOFF_Y, operandInfo.type);
+}
+void test_function_getShortLongoffIndexX_Y_SP_given__SP_expect_Shortoff_SP(void){
+    OperandInfo operandInfo;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+    OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
+    IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"SP"};
+    getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+    getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
+
+  	getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(SHORTOFF_SP, operandInfo.type);
+}
+void test_function_getShortLongoffIndexX_Y_SP_given__X_expect_Shortoff_X(void){
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
     OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
     IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"X"};
-
     getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
     getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
-    Try {
-  		getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
-  	}Catch(ex) {
-  	  TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
-    }
+
+  	getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(SHORTOFF_X, operandInfo.type);
 }
-void test_function_handleLongShortoff_given_shortoff_0x10_X_expect_not_exception(void){
+void test_function_getShortLongoffIndexX_Y_SP_given_comma_to_anotherSymbols_expect_exception_not_valid_operator(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  //  str = "10,X)"
+
+    OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,"$"};
+    getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+
+    Try {
+  		getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
+  	}Catch(ex) {
+  	  TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR, ex);
+    }
+}
+void test_function_getShortLongoffIndexX_Y_SP_given_alphaberts_other_than_XYSP_expect_exception_not_valid_identifier(void){
+    CEXCEPTION_T ex;
+    OperandInfo operandInfo;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+    OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
+    IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,2,"Z"};
+    getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+    getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
+
+    Try {
+  		getShortlongoffIndexX_Y_SP(tokenizer, &operandInfo);
+  	}Catch(ex) {
+  	  TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER, ex);
+    }
+}
+
+//test function convertShortoffToLongoff
+void test_function_convert_ShortOff_to_LongOFF_given_Shortoff_X_expect_Longoff_X(void){
+    OperandInfo operandInfo;
+    operandInfo.type = SHORTOFF_X;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+  	convertShortoffToLongoff(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(LONGOFF_X,operandInfo.type );
+}
+void test_function_convert_ShortOff_to_LongOFF_given_Shortoff_Y_expect_Longoff_Y(void){
+    OperandInfo operandInfo;
+    operandInfo.type = SHORTOFF_Y;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+  	convertShortoffToLongoff(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(LONGOFF_Y,operandInfo.type );
+}
+void test_function_convert_ShortOff_to_LongOFF_given_Shortoff_SP_expect_not_valid_operandInfoType(void){
+      CEXCEPTION_T ex;
+      OperandInfo operandInfo;
+      operandInfo.type = SHORTOFF_SP;
+      Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+    	Try {
+    		convertShortoffToLongoff(tokenizer, &operandInfo);
+    	}Catch(ex) {
+    	TEST_ASSERT_EQUAL(NOT_VALID_OPREANDINFO_TYPE,ex);
+    	}
+    }
+
+/*
+  -------handlelongshortoff-------
+  *test given 0x10,X get SHORTOFF_X
+  *test given 0x1000,X get LONGPTROFF_X
+  *test given 0x10,Y get SHORTOFF_Y
+  *test given 0x1000,Y get LONGPTROFF_Y
+  others posibilities may be wrong has been tried in previous
+*/
+void test_function_handleLongShortoff_given_shortoff_0x10_X_expect_SHORTOFF_X(void){
+    OperandInfo operandInfo;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  //  str = "10,X"
   	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0x10",0x10};
     OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
     IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"X"};
@@ -497,18 +573,13 @@ void test_function_handleLongShortoff_given_shortoff_0x10_X_expect_not_exception
   	getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
 
 
-  	Try {
   		handleShortLongoff(tokenizer, &operandInfo);
-      printf("%d\n",operandInfo.type);
-  	}Catch(ex) {
-  	TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION, ex);
-  	}
-  }
-void test_function_handleLongShortoff_given_shortoff_0x10_Y_expect_not_exception(void){
-      CEXCEPTION_T ex;
+  	  TEST_ASSERT_EQUAL(SHORTOFF_X, operandInfo.type);
+}
+void test_function_handleLongShortoff_given_shortoff_0x10_Y_expect_SHORTOFF_Y(void){
       OperandInfo operandInfo;
       Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-    //  str = "10,X)"
+    //  str = "10,Y"
     	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0x10",0x10};
       OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
       IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"Y"};
@@ -520,14 +591,10 @@ void test_function_handleLongShortoff_given_shortoff_0x10_Y_expect_not_exception
     	getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
 
 
-    	Try {
-    		handleShortLongoff(tokenizer, &operandInfo);
-        printf("%d\n",operandInfo.type);
-    	}Catch(ex) {
-    	TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION, ex);
-    	}
-    }
-void xtest_function_handleLongShortoff_given_longoff_0x1000_X_expect_not_exception(void){
+     handleShortLongoff(tokenizer, &operandInfo);
+     TEST_ASSERT_EQUAL(SHORTOFF_Y,operandInfo.type);
+}
+void test_function_handleLongShortoff_given_longoff_0x1000_X_expect_LONGOFF_X(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -543,14 +610,10 @@ void xtest_function_handleLongShortoff_given_longoff_0x1000_X_expect_not_excepti
     getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
 
 
-    Try {
-      handleShortLongoff(tokenizer, &operandInfo);
-      printf("%d\n",operandInfo.type);
-      }Catch(ex) {
-      TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION, ex);
-      }
+    handleShortLongoff(tokenizer, &operandInfo);
+    TEST_ASSERT_EQUAL(LONGOFF_X,operandInfo.type);
 }
-void test_function_handleLongShortoff_given_Lonfoff_0x1000_Y_expect_not_exception(void){
+void test_function_handleLongShortoff_given_Lonfoff_0x1000_Y_expect_LONGOFF_Y(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -565,84 +628,63 @@ void test_function_handleLongShortoff_given_Lonfoff_0x1000_Y_expect_not_exceptio
     getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
   	getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
 
-  	Try {
-  		handleShortLongoff(tokenizer, &operandInfo);
-      printf("%d\n",operandInfo.type);
-  	}Catch(ex) {
-  	TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION, ex);
-  	}
-  }
-void xtest_function_handleLongShortoff_given_shortoff_0x10_Z_expect_exception(void){
-
-      CEXCEPTION_T ex;
-      OperandInfo operandInfo;
-      Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-    //  str = "10,Z)"
-    	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0x10",0x10};
-      OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
-      IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"Y"};
-      OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,")"};
-
-      getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
-      getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
-      getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
-    	getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
-
-
-    	Try {
-    		handleShortLongoff(tokenizer, &operandInfo);
-        printf("%d\n",operandInfo.type);
-    	}Catch(ex) {
-    	TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION, ex);
-    	}
+  	handleShortLongoff(tokenizer, &operandInfo);
+  	TEST_ASSERT_EQUAL(LONGOFF_Y, operandInfo.type);
 }
-void test_function_handleLongShortoff_given_longoff_0x1000_Y_expect_exception(void){
-      CEXCEPTION_T ex;
-      OperandInfo operandInfo;
-      Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-      char *str = "1000,X)";
-    	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0x1000",0x1000};
-      OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,0,1,","};
-      IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,0,1,"X"};
-      OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,")"};
 
-      getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
-      getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
-      getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
-    	getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
+//test function handle byte
+void test_function_handlebyte_given_comma_replace_dollarSymbol_expect_NOT_VALID_OEPERATOR(void){
+    CEXCEPTION_T ex;
+    OperandInfo operandInfo;
+    operandInfo.value = 0x97;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
+    OperatorToken   dollarToken = {TOKEN_OPERATOR_TYPE, 0,1,","};
+    getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
 
-    	Try {
-    		handleShortLongoff(tokenizer, &operandInfo);
-        printf("%d\n",operandInfo.type);
-    	}Catch(ex) {
-    	TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
-    	}
-    }
-
-void test_function_handlebyte_given_0x97_expect_exception(void){
+  	Try {
+  		handleByte(tokenizer, &operandInfo);
+  	}Catch(ex) {
+  	TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR, ex);
+  	}
+}
+void test_function_handlebyte_given_0xFF1_expect_Limit_EXCEEDED(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     operandInfo.value = 0x97;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
     OperatorToken   dollarToken = {TOKEN_OPERATOR_TYPE, 0,1,"$"};
-    IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,2,"0xff",0xff};
-
+    IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,5,"0xff1",0xff1};
     getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
     getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
   	Try {
   		handleByte(tokenizer, &operandInfo);
   	}Catch(ex) {
-  	TEST_ASSERT_EQUAL(EXTRA_OPERAND, ex);
+  	TEST_ASSERT_EQUAL(LIMIT_EXCEEDED, ex);
   	}
   }
+void test_function_handlebyte_given_0xFF_expect_BYTE(void){
+  OperandInfo operandInfo;
+  operandInfo.value = 0x97;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+  OperatorToken   dollarToken = {TOKEN_OPERATOR_TYPE, 0,1,"$"};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,5,"0xff",0xff};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+  handleByte(tokenizer, &operandInfo);
+  TEST_ASSERT_EQUAL(BYTE, operandInfo.type);
+}
+
+
 void test_function_handleLongShortMem_given_0x97_expect_shortMem(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0x97",0x97};
+  	IntegerToken intToken = {TOKEN_INTEGER_TYPE,0,2,"0xff",0xff};
 
   	getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
