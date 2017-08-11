@@ -124,6 +124,8 @@ void handleShortLongPtr(Tokenizer *tokenizer,OperandInfo *operandInfo){
       convertShortLongPtrType(tokenizer,operandInfo);
       gettokenDotWBracket(tokenizer,operandInfo);
       }
+    else
+    Throw(NOT_VALID_OPERATOR);
 }
 void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IdentifierToken *idToken;
@@ -138,7 +140,7 @@ void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo
                 operandInfo->type = SHORTPTR_X;
               else if(operandInfo->type == LONGPTR)
                 operandInfo->type = LONGPTR_X;
-                }
+            }
             else if(strcmp(idToken->str,"Y")==0){
               if(operandInfo->type == SHORTPTR)
                 operandInfo->type = SHORTPTR_Y;
@@ -236,8 +238,14 @@ void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo){
          operandInfo->type = LONG_MEM;
        else if(operandInfo->type == Short)
          operandInfo->type = SHORT_MEM;
+       else
+        Throw(NOT_VALID_OPREANDINFO_TYPE);
 }
-
+/*
+  *function handeleNext_2_Operandmain is Check the token.type either is IdentifierToken or OperatorToken
+  *if token type = IdentifierToken,it goes to get IndexX or IndexY
+  *if token type = OperatorToken, it goes to get SHort/longOff or ShortLongPtr with Index
+*/
 void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
   IdentifierToken *idToken;
   OperatorToken *opToken;
@@ -250,7 +258,7 @@ void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
           else if(strcmp(idToken->str,"Y")==0)
             operandInfo->type = IndexY;
           else
-            Throw(NOT_VALID_INSTRUCTION);
+            Throw(NOT_VALID_IDENTIFIER);
             getCloseBracketSymbol(tokenizer,operandInfo);
         }
     else if(token->type == TOKEN_OPERATOR_TYPE)
@@ -266,7 +274,14 @@ void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
     else
       Throw(ERR_SYNTAX);
 }
-
+/*
+  function handleNEXTOperandMain
+  ''#'' = get function handlebyte
+  ''$''= get function handlelongshortmem
+  ''('' = get functiom handleNExt_2_OperandMain
+   -- get indexX/indexY/longshortoff/longshortptrwithindex
+  ''['' = get function ShortLongPtr
+*/
 void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
     OperatorToken *opToken;
     Token *token = getToken(tokenizer);
@@ -292,7 +307,6 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
 
 void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
   uint8_t *code = *memoryToWriteCode;
-//  printf("%d\n",operandInfo->type);
   switch (operandInfo->type) {
     case LONG_MEM:
     code[0] = operandInfo->baseOpcode + 0xC0;
