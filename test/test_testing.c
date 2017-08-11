@@ -908,8 +908,10 @@ void test_function_handleNEXTOperandMain_given_symbol_comma_expect_not_valid_ope
 }
 
 
-//--------- Function displayOpcode---------
-
+/*--------- Function displayOpcode---------
+  *give baseOpcode = 0x09
+  baseOpcode is depends on instruction
+*/
 void test_FUNCTION_DISPLAYOPCODE_given_0x97_Shortptr_expect_0x97D992(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
