@@ -1,4 +1,4 @@
-#include "testing.h"
+#include "Assemble.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -41,8 +41,9 @@ void trt(Tokenizer *tokenizer,OperandInfo *operandInfo){
 }
 
 
-CheckIdentifier instructionTable[]= {
+instructionTable[]= {
   {"ADD", add},
+  {"ADC", adc},
 };
 
 void add(){
@@ -50,9 +51,10 @@ void add(){
 }
 
 void testABC(){
-  instructionTable["ADD"].execute;
+  strcmp("ADD",instructionTable);
 }
 */
+
 
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IntegerToken *intToken;
@@ -95,11 +97,11 @@ void gettokenDotWBracket(Tokenizer *tokenizer,OperandInfo *operandInfo){
   idToken = (IdentifierToken *)getToken(tokenizer);
     if(idToken->type ==TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"W") ==0)){
   opToken = (OperatorToken *)getToken(tokenizer);
-    if(opToken->type !=TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,"]") !=0)){
+    if(opToken->type ==TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,"]") ==0)){}
+    else
       throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
                         "NOT_VALID_OPERATOR, expecting a ']', but received '%s'\n", \
                          opToken->str);
-      }
     }
     else
     throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
@@ -350,7 +352,7 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
       }
       else
       throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
-                      "NOT_VALID_IDENTIFIER, expecting a '$' / '#' / '(' / ']' , but received '%s'\n", \
+                      "NOT_VALID_OPERATOR, expecting a '$' / '#' / '(' / ']' , but received '%s'\n", \
                        opToken->str);
     }
     else
@@ -496,11 +498,40 @@ void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo){
     else if(isTokenMatchesString(instructionTocompare,"XOR"))
       operandInfo->baseOpcode = 0x08;
     else if(isTokenMatchesString(instructionTocompare,"BREAK"))
-    operandInfo->baseOpcode = 0x8B;
+      operandInfo->baseOpcode = 0x8B;
+    else if(isTokenMatchesString(instructionTocompare,"CCF"))
+      operandInfo->baseOpcode = 0x8C;
+    else if(isTokenMatchesString(instructionTocompare,"HALT"))
+      operandInfo->baseOpcode = 0x8E;
+    else if(isTokenMatchesString(instructionTocompare,"IRET"))
+      operandInfo->baseOpcode = 0x80;
+    else if(isTokenMatchesString(instructionTocompare,"NOP"))
+      operandInfo->baseOpcode = 0x9D;
+    else if(isTokenMatchesString(instructionTocompare,"RCF"))
+      operandInfo->baseOpcode = 0x98;
+    else if(isTokenMatchesString(instructionTocompare,"RET"))
+      operandInfo->baseOpcode = 0x81;
+    else if(isTokenMatchesString(instructionTocompare,"RETF"))
+      operandInfo->baseOpcode = 0x87;
+    else if(isTokenMatchesString(instructionTocompare,"RIM"))
+      operandInfo->baseOpcode = 0x9A;
+    else if(isTokenMatchesString(instructionTocompare,"RVF"))
+      operandInfo->baseOpcode = 0x9C;
+    else if(isTokenMatchesString(instructionTocompare,"SCF"))
+      operandInfo->baseOpcode = 0x99;
+    else if(isTokenMatchesString(instructionTocompare,"SIM"))
+      operandInfo->baseOpcode = 0x9B;
+    else if(isTokenMatchesString(instructionTocompare,"TRAP"))
+      operandInfo->baseOpcode = 0x83;
+    else if(isTokenMatchesString(instructionTocompare,"WFI"))
+      operandInfo->baseOpcode = 0x8F;
     else
-    Throw(NOT_VALID_INSTRUCTION);
+    Throw(createException("NOT_VALID_INSTRUCTION ,out of scope" \
+                           ,NOT_VALID_INSTRUCTION));
 }
-
+/* this function is get build-in instruction
+ like BREAK,CCF,HALT
+*/
 int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
   assemblyName = convertToUpperCase(assemblyName);
   Tokenizer *tokenizer = initTokenizer(assemblyName);
@@ -514,13 +545,14 @@ int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
     displayOpcode(memoryToWriteCode,&operandInfo);
   }
   else
-    Throw(NOT_VALID_INSTRUCTION);
+  throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
+                "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                 token->type);
 }
 /*this function is get the 1st 3 token to identify them
   use function identifyInstruction to change the baseOpcode
   such as ADD A, ADC A, SUB A, have different baseOpcode
 */
-
 int assemble(char *assemblyName, char **memoryToWriteCode){
   assemblyName = convertToUpperCase(assemblyName);
   Tokenizer *tokenizer = initTokenizer(assemblyName);
@@ -532,9 +564,6 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
   if(token->type == TOKEN_IDENTIFIER_TYPE){
     idToken = (IdentifierToken *)token;
     identifyInstruction(idToken->str,&operandInfo);
-  }
-  else
-    Throw(NOT_VALID_INSTRUCTION);
   //2nd token
   idToken =(IdentifierToken *)getToken(tokenizer);
   if(token->type == TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"A") == 0)){
@@ -546,8 +575,17 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
     displayOpcode(memoryToWriteCode,&operandInfo);
   }
   else
-    Throw(NOT_VALID_OPERATOR);
+  throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
+                  "NOT_VALID_OPERATOR, expecting a ',' , but received '%s'\n", \
+                   opToken->str);
   }
   else
-    printf("aaa");
+  throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
+                  "NOT_VALID_IDENTIFIER, expecting a 'A' , but received '%s'\n", \
+                   idToken->str);
+  }
+  else
+    throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
+                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                   token->type);
 }

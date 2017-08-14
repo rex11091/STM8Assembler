@@ -40,7 +40,6 @@ struct CheckIdentifier{
   char* (*execute)();    // a function
 };
 
-void add();
 void convertShortLongPtrType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getCloseBracketSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
