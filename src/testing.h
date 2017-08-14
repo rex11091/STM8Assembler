@@ -26,6 +26,7 @@ typedef enum{
   LONGPTR_X,
   Long,
   Short,
+  Inherent,
 }OperandType;
 
 typedef struct OperandInfo OperandInfo;
@@ -34,6 +35,7 @@ struct OperandInfo{
   int baseOpcode;
   int value;
 };
+void convertShortLongPtrType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getCloseBracketSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void gettokenDotWBracket(Tokenizer *tokenizer,OperandInfo *operandInfo);

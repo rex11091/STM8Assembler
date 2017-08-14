@@ -1,6 +1,8 @@
 #include "testing.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include "Tokenizer.h"
 #include "Token.h"
 #include "error.h"
@@ -407,8 +409,14 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
     code[3] = operandInfo->value & 0xff;
     *memoryToWriteCode +=4;
     break;
+
+    case Inherent:
+    code[0] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=1;
+    break;
+
     default:
-    Throw(ERR_SYNTAX);
+    Throw(NOT_VALID_OPREANDINFO_TYPE);
   }
 
 }
@@ -420,14 +428,46 @@ void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo){
       operandInfo->baseOpcode = 0x0B;
     else if(isTokenMatchesString(instructionTocompare,"AND"))
       operandInfo->baseOpcode = 0x04;
+    else if(isTokenMatchesString(instructionTocompare,"BCP"))
+      operandInfo->baseOpcode = 0x05;
+    else if(isTokenMatchesString(instructionTocompare,"CP"))
+      operandInfo->baseOpcode = 0x01;
+    else if(isTokenMatchesString(instructionTocompare,"LD"))
+      operandInfo->baseOpcode = 0x06;
+    else if(isTokenMatchesString(instructionTocompare,"OR"))
+      operandInfo->baseOpcode = 0x0A;
+    else if(isTokenMatchesString(instructionTocompare,"SBC"))
+      operandInfo->baseOpcode = 0x02;
+    else if(isTokenMatchesString(instructionTocompare,"SUB"))
+      operandInfo->baseOpcode = 0x00;
+    else if(isTokenMatchesString(instructionTocompare,"XOR"))
+      operandInfo->baseOpcode = 0x08;
+    else if(isTokenMatchesString(instructionTocompare,"BREAK"))
+    operandInfo->baseOpcode = 0x8B;
     else
     Throw(NOT_VALID_INSTRUCTION);
 }
 
+int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
+  assemblyName = convertToUpperCase(assemblyName);
+  Tokenizer *tokenizer = initTokenizer(assemblyName);
+  Token *token = getToken(tokenizer);
+  IdentifierToken *idToken;
+  OperandInfo operandInfo;
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+    idToken = (IdentifierToken *)token;
+    identifyInstruction(idToken->str,&operandInfo);
+    operandInfo.type = Inherent;
+    displayOpcode(memoryToWriteCode,&operandInfo);
+  }
+  else
+    Throw(NOT_VALID_INSTRUCTION);
+}
 /*this function is get the 1st 3 token to identify them
   use function identifyInstruction to change the baseOpcode
   such as ADD A, ADC A, SUB A, have different baseOpcode
 */
+
 int assemble(char *assemblyName, char **memoryToWriteCode){
   assemblyName = convertToUpperCase(assemblyName);
   Tokenizer *tokenizer = initTokenizer(assemblyName);
@@ -443,8 +483,8 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
   else
     Throw(NOT_VALID_INSTRUCTION);
   //2nd token
-  token   = getToken(tokenizer);
-  if(token->type == TOKEN_IDENTIFIER_TYPE)
+  idToken =(IdentifierToken *)getToken(tokenizer);
+  if(token->type == TOKEN_IDENTIFIER_TYPE && isTokenMatchesString(idToken->str,"A"))
     idToken = (IdentifierToken *)token;
   else
     Throw(NOT_VALID_IDENTIFIER);

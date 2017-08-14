@@ -1,5 +1,7 @@
 #ifndef _ERROR_H
 #define _ERROR_H
+#include <stdint.h>
+#include <inttypes.h>
 
 #define NOT_VALID_IDENTIFIER 10
 #define NOT_VALID_OPERATOR  20
