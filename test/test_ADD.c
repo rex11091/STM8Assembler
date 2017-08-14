@@ -492,4 +492,3 @@ void test_asesemble_given_add_longptr_index_X_expect_0x5545DB72(void){
   printf("0x%02x%02x%02x%02x\n",buffer[0],buffer[1],buffer[2],buffer[3]);
 
 }
-

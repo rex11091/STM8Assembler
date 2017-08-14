@@ -28,13 +28,19 @@ typedef enum{
   Short,
   Inherent,
 }OperandType;
-
 typedef struct OperandInfo OperandInfo;
 struct OperandInfo{
   OperandType type;
   int baseOpcode;
   int value;
 };
+typedef struct CheckIdentifier CheckIdentifier;
+struct CheckIdentifier{
+  char name;
+  char* (*execute)();    // a function
+};
+
+void add();
 void convertShortLongPtrType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void getCloseBracketSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
@@ -51,6 +57,7 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
 void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
+int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode);
 
 #define isTokenMatchesString(token,str2cmp)  (strcmp(token,str2cmp )== 0)
 

@@ -30,6 +30,7 @@ typedef struct {
   uint32_t startColumn;
   uint32_t length;
   char *str;
+  char *originalStr;
 } Token;
 
 typedef struct {
@@ -37,6 +38,7 @@ typedef struct {
   uint32_t startColumn;
   uint32_t length;
   char *str;
+  char *originalStr;
   int value;
 } IntegerToken;
 
@@ -53,6 +55,7 @@ typedef struct {
   uint32_t startColumn;
   uint32_t length;
   char *str;
+  char *originalStr;
 } IdentifierToken, StringToken, CharConstToken;
 
 typedef struct {
@@ -60,6 +63,7 @@ typedef struct {
   uint32_t startColumn;
   uint32_t length;
   char *str;
+  char *originalStr;
   Token *token[0];
 } OperatorToken;
 

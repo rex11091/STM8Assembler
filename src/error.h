@@ -11,4 +11,5 @@
 #define ERR_SYNTAX  60
 #define NOT_VALID_OPREANDINFO_TYPE 70
 #define EXTRA_OPERAND 80
+#define WRONG_TOKEN_TYPE  90
 #endif // _ERROR_H

@@ -4,8 +4,17 @@
 #include <stdarg.h>
 #include "CException.h"
 #include "Exception.h"
+#include "Token.h"
 
-void throwException(int errorCode, char *message, ...) {
+
+Exception *createException(char *msg, int errorCode){
+  Exception *e = malloc(sizeof(Exception));
+  e -> msg = msg;
+  e -> errorCode = errorCode;
+  return e;
+}
+
+void throwException(int errorCode, void *data, char *message, ...) {
   va_list args;
   char *buffer;
   int length;
@@ -20,6 +29,7 @@ void throwException(int errorCode, char *message, ...) {
 
   e->msg = buffer;
   e->errorCode = errorCode;
+  e->data = data;
 
   Throw(e);
 }
@@ -31,7 +41,26 @@ void freeException(Exception *e) {
     free(e);
   }
 }
+void freeException1(Exception *e){
+  free(e);
+}
 
-void dumpException(Exception *e) {
-  printf("%s (err=%d)\n", e->msg, e->errorCode);
+void dumpErrorMessage(CEXCEPTION_T ex, int lineNo) {
+  Token *token = (Token *)ex->data;
+  int i = token->length - 1;
+  if(i < 0) i = 0;
+
+  printf("Error %d:\n", lineNo);
+  printf("%s\n", ex->msg);
+  printf("%s\n", token->originalStr);
+  printf("%*s", token->startColumn + 1, "^");
+  while(i--)
+    printf("~");
+    putchar('\n');
+    printf("-----------------------------------------------------------------");
+}
+
+void dumpException(Exception *e){
+  printf ("%s (err = %d)\n", e->msg, e->errorCode);
+  printf("-----------------------------------------------------------------");
 }
