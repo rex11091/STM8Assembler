@@ -27,6 +27,8 @@ typedef enum{
   Long,
   Short,
   Inherent,
+  DirectX,
+  DirectY,
 }OperandType;
 typedef struct OperandInfo OperandInfo;
 struct OperandInfo{
@@ -57,6 +59,7 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
 void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode);
+void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo,char **memoryToWriteCode);
 
 #define isTokenMatchesString(token,str2cmp)  (strcmp(token,str2cmp )== 0)
 

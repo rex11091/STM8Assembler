@@ -15,6 +15,126 @@ void tearDown(void)
 {
 }
 
+// test function CheckA_X_Y_index
+void test_Check_X_Y_index_given_X_baseOpcode_11_expect_directX_0x11(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD X,";
+  operandInfo.baseOpcode = 0x11;
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  TEST_ASSERT_EQUAL(DirectX,operandInfo.type);
+  TEST_ASSERT_EQUAL_HEX(0x11,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[1],memoryToWriteCode);
+  printf("0x%02x\n",buffer[0]);
+}
+void test_Check_X_Y_index_given_Y_baseOpcode_11_expect_directY_0x1190(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD Y,";
+  operandInfo.baseOpcode = 0x11;
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  TEST_ASSERT_EQUAL(DirectY,operandInfo.type);
+  TEST_ASSERT_EQUAL_HEX(0x1190,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
+}
+void test_Check_X_Y_index_given_A_hash_going_handlebyte_expect_Byte(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD A,#$10";
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+  OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,5 ,1,",",str};
+  OperatorToken HashToken = {TOKEN_OPERATOR_TYPE,6 ,1,"#",str};
+  OperatorToken DollarToken = {TOKEN_OPERATOR_TYPE,7 ,1,"$",str};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,8 ,2,"0x10",str,0x10};
+
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&DollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  TEST_ASSERT_EQUAL(BYTE,operandInfo.type);
+  TEST_ASSERT_EQUAL_HEX(0x10A0,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
+}
+void test_Check_X_Y_index_given_Another_Symbols_than_comma_expect_not_valid_operator(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD A*#$10";
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+  OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,5 ,1,"*",str};
+
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
+
+  Try {
+    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex,1);
+    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
+  }
+    freeException(ex);
+}
+void test_Check_X_Y_index_given_Z_expect_not_valid_identifier(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD Z,#$10";
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Z",str};
+
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  Try {
+    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex,1);
+    TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER,ex->errorCode);
+  }
+    freeException(ex);
+}
+void test_Check_X_Y_index_given_integerType_expect_Wrong_token_type(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ADD A,#$10";
+  IdentifierToken AToken = {TOKEN_INTEGER_TYPE,4 ,1,"A",str};
+
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  Try {
+    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex,1);
+    TEST_ASSERT_EQUAL(WRONG_TOKEN_TYPE,ex->errorCode);
+  }
+    freeException(ex);
+}
+
 
 //test function getLongShortType
 void test_function_getlongshortType_given_0x97_expect_short_16(void){
@@ -93,6 +213,8 @@ void test_function_getlongshortType_given_operatorTokenType_expect_Exception_Wro
   }
     freeException(ex);
 }
+
+
 //test function gettokenDotWBracket
 void test_function_gettokenDotWBracket_given_comma_represent_dollar_expect_not_valid_operator(void){
   CEXCEPTION_T ex;
@@ -168,6 +290,7 @@ void test_function_gettokenDotWBracket_given_dot_W_bracket_expect_not_exception(
       }
   //  freeException(ex);
 }
+
 
 //test function getCloseBracketSymbol
 void test_function_getCloseBracket_given_comma_expect_exception_not_valid_operator(void){
@@ -471,7 +594,6 @@ void test_function_handleShortLongPtrorWithIndex_given_0x1000_Y_expect_Not_valid
 
 
 //test function getShortlongoffIndexX_Y_SP
-
 void test_function_getShortLongoffIndexX_Y_SP_given_Y_expect_Shortoff_Y(void){
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -608,6 +730,8 @@ void test_function_convert_ShortOff_to_LongOFF_given_longptr_expect_not_valid_op
           }
           freeException1(ex);
 }
+
+
 /*
   -------handlelongshortoff-------
   *test given 0x10,X get SHORTOFF_X
@@ -1040,391 +1164,6 @@ void test_function_handleNEXTOperandMain_given_Not_operator_type_expect_Wrong_to
     freeException(ex);
 }
 
-
-/*--------- Function displayOpcode---------
-  *give baseOpcode = 0x09
-  baseOpcode is depends on instruction
-  test something which not in operandtype
-*/
-void test_FUNCTION_DISPLAYOPCODE_given_0x97_Shortptr_expect_0x97D992(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = SHORTPTR_X;
-  operandInfo.value = 0x97;
-  operandInfo.baseOpcode = 0x09;
-
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x97D992,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_0x97ff_longptr_expect_0xff97D972(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = LONGPTR_X;
-  operandInfo.value = 0x97ff;
-  operandInfo.baseOpcode = 0x09;
-
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0xff97D972,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[4],memoryToWriteCode);
-
-}
-void test_FUNCTION_DISPLAYOPCODE_given_0x97B9_shortmem_expect_0x97B9(void){
-      uint8_t buffer[4] = {0,0,0,0};
-      char *memoryToWriteCode = buffer;
-      OperandInfo operandInfo;
-      operandInfo.type = SHORT_MEM;
-      operandInfo.value = 0x97;
-      operandInfo.baseOpcode = 0x09;
-
-     displayOpcode(&memoryToWriteCode,&operandInfo);
-     TEST_ASSERT_EQUAL_HEX(0x97B9,*(uint32_t *)buffer);
-     TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-    }
-void test_FUNCTION_DISPLAYOPCODE_given_0x5597B9_longmem_expect_0x5597C9(void){
-      uint8_t buffer[4] = {0,0,0,0};
-      char *memoryToWriteCode = buffer;
-      OperandInfo operandInfo;
-      operandInfo.type = LONG_MEM;
-      operandInfo.value = 0x9755;
-      operandInfo.baseOpcode = 0x09;
-
-     displayOpcode(&memoryToWriteCode,&operandInfo);
-     TEST_ASSERT_EQUAL_HEX(0x5597C9,*(uint32_t *)buffer);
-     TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-    }
-void test_FUNCTION_DISPLAYOPCODE_given_longoffY_expect_0x5597D990(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = LONGOFF_Y;
-  operandInfo.value = 0x9755;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x5597D990,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[4],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_shortoffY_expect_0x97E990(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = SHORTOFF_Y;
-  operandInfo.value = 0x97;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x97E990,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_shortoffX_expect_0x98E9(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = SHORTOFF_X;
-  operandInfo.value = 0x98;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x98E9,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_longoffX_expect_0x9797D9(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =LONGOFF_X;
-  operandInfo.value = 0x9797;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x9797D9,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_shortoffSP_expect_0x5519(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =SHORTOFF_SP;
-  operandInfo.value = 0x55;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x5519,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_byte_expect_0x10A9(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =BYTE;
-  operandInfo.value = 0x10;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x10A9,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_IndexX_expect_0xF9(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =IndexX;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0xF9,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[1],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_IndexY_expect_0xf990(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =IndexY;
-  operandInfo.value = 0x10;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0xf990,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_ShortptrX_expect_0x10D992(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =SHORTPTR_X;
-  operandInfo.value = 0x10;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x10D992,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_ShortptrY_expect_0x11D991(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =SHORTPTR_Y;
-  operandInfo.value = 0x11;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x11D991,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[3],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_LongPtrX_expect_0x1555D972(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =LONGPTR_X;
-  operandInfo.value = 0x1555;
-  operandInfo.baseOpcode = 0x09;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x5515D972,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[4],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_Inherent_break_expect_0x8b(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type =Inherent;
-  operandInfo.baseOpcode = 0x8b;
-  displayOpcode(&memoryToWriteCode,&operandInfo);
-  TEST_ASSERT_EQUAL_HEX(0x8b,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[1],memoryToWriteCode);
-}
-void test_FUNCTION_DISPLAYOPCODE_given_longptrY_expect_not_valid_operandtype(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  operandInfo.type = 25;
-  Try {
-      displayOpcode(&memoryToWriteCode,&operandInfo);
-    }Catch(ex)
-      {
-      dumpException(ex);
-      TEST_ASSERT_EQUAL(NOT_VALID_OPREANDINFO_TYPE,ex->errorCode);
-      }
-      freeException1(ex);
-}
-
-
-//test function identifyInstruction
-void test_function_identifyInstruction_given_ADC_expect_baseOpcode_9(void){
-  char *str = "ADC";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x9,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_XOR_expect_baseOpcode_8(void){
-  char *str = "XOR";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x8,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_SUB_expect_baseOpcode_0(void){
-  char *str = "SUB";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x0,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_OR_expect_baseOpcode_A(void){
-  char *str = "OR";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0xA,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_LD_expect_baseOpcode_6(void){
-  char *str = "LD";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x6,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_CP_expect_baseOpcode_1(void){
-  char *str = "CP";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x1,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_BCP_expect_baseOpcode_5(void){
-  char *str = "BCP";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x5,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_AND_expect_baseOpcode_4(void){
-  char *str = "AND";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x4,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_ADD_expect_baseOpcode_B(void){
-  char *str = "ADD";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0xB,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_SBC_expect_baseOpcode_2(void){
-  char *str = "SBC";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x2,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_BREAK_expect_baseOpcode_8b(void){
-  char *str = "BREAK";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x8B,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_CCF_expect_baseOpcode_8C(void){
-  char *str = "CCF";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x8C,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_HALT_expect_baseOpcode_8E(void){
-  char *str = "HALT";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x8E,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_IRET_expect_baseOpcode_80(void){
-  char *str = "OR";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0xA,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_NOP_expect_baseOpcode_9D(void){
-  char *str = "NOP";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x9D,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_RCF_expect_baseOpcode_98(void){
-  char *str = "RCF";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x98,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_RET_expect_baseOpcode_81(void){
-  char *str = "RET";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x81,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_RETF_expect_baseOpcode_87(void){
-  char *str = "RETF";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x87,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_RIM_expect_baseOpcode_9A(void){
-  char *str = "RIM";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x9A,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_RVF_expect_baseOpcode_9C(void){
-  char *str = "RVF";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x9C,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_SCF_expect_baseOpcode_99(void){
-  char *str = "SCF";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x99,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_SIM_expect_baseOpcode_9B(void){
-  char *str = "SIM";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x9B,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_TRAP_expect_baseOpcode_83(void){
-  char *str = "TRAP";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x83,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_WFI_expect_baseOpcode_8f(void){
-  char *str = "WFI";
-  OperandInfo operandInfo;
-  identifyInstruction(str,&operandInfo);
-  printf("%d\n",operandInfo.baseOpcode );
-  TEST_ASSERT_EQUAL_HEX(0x8F,operandInfo.baseOpcode);
-}
-void test_function_identifyInstruction_given_others_instruction_expect_Not_valid_instruction(void){
-  CEXCEPTION_T ex;
-  char *str = "ZZZ";
-  OperandInfo operandInfo;
-  Try {
-    identifyInstruction(str,&operandInfo);
-  }Catch(ex)
-    {
-    dumpException(ex);
-    TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION,ex->errorCode);
-    }
-    freeException1(ex);
-}
-
 void test_handleinherentInstruction_given_Break_expect_8B(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
@@ -1444,64 +1183,50 @@ void test_handleinherentInstruction_given_Break_expect_8B(void){
 
 }
 
-void test_asesemble_given_Not_comma_symbol_expect_not_valid_identifier(void){
-  CEXCEPTION_T ex;
+void test_asesemble_given_add_byte_0x55_expect_0x55AB(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD Z,";
+  char str[] = "aDd A,#$55";
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADD",str};
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Z",str};
-  initTokenizer_ExpectAndReturn(str,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-  Try {
-      assemble(str, &memoryToWriteCode);
-    }Catch(ex)
-      {
-        dumpErrorMessage(ex, 1);
-          TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER,ex->errorCode);
-      }
-        freeException(ex);
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+  OperatorToken   HashToken ={TOKEN_OPERATOR_TYPE, 6,1,"#",str};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55",str,0x55};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+	assemble(str, &memoryToWriteCode);
+  TEST_ASSERT_EQUAL_HEX(0x55AB,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
 }
-void test_asesemble_given_Not_comma_symbol_expect_not_valid_operator(void){
+void test_asesemble_given_operator_type_expect_wrong_token_type(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD A[";
-  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADD",str};
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
-  OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,"[",str};
-  initTokenizer_ExpectAndReturn(str,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+  char str[] = "aDd A,#$55";
+  IdentifierToken ADDToken = {TOKEN_OPERATOR_TYPE, 0,3,"ADD",str};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+
   Try {
     assemble(str, &memoryToWriteCode);
-  }Catch(ex) {
-    dumpErrorMessage(ex, 1);
-    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
-  }
-    freeException(ex);
-}
-void test_asesemble_given_integer_token_type_expect_wrong_token_type(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD A,";
-  IdentifierToken ADDToken = {TOKEN_INTEGER_TYPE, 0,3,"ADD",str};
-  initTokenizer_ExpectAndReturn(str,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
-  Try {
-    assemble(str, &memoryToWriteCode);
-  }Catch(ex) {
-    dumpErrorMessage(ex, 1);
+  }Catch(ex)
+    {
+    dumpErrorMessage(ex,1);
     TEST_ASSERT_EQUAL(WRONG_TOKEN_TYPE,ex->errorCode);
-  }
+    }
     freeException(ex);
 }

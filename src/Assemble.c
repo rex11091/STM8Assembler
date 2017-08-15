@@ -11,8 +11,6 @@
 #include "Exception.h"
 
 
-
-
 /*
 void trt(Tokenizer *tokenizer,OperandInfo *operandInfo){
   OperatorToken   *opToken;
@@ -54,7 +52,40 @@ void testABC(){
   strcmp("ADD",instructionTable);
 }
 */
-
+void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memoryToWriteCode){
+  IdentifierToken *idToken;
+  OperatorToken *opToken;
+  idToken =(IdentifierToken *)getToken(tokenizer);
+  if(idToken->type == TOKEN_IDENTIFIER_TYPE){
+    if(isTokenMatchesString(idToken->str,"X")){
+      operandInfo->type = DirectX;
+      displayOpcode(memoryToWriteCode,operandInfo);
+    }
+    else if(isTokenMatchesString(idToken->str,"Y")){
+      operandInfo->type = DirectY;
+      displayOpcode(memoryToWriteCode,operandInfo);
+    }
+    else if(isTokenMatchesString(idToken->str,"A")){
+      opToken = (OperatorToken *)getToken(tokenizer);
+      if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0)){
+        handleNEXTOperandMain(tokenizer,operandInfo);
+        displayOpcode(memoryToWriteCode,operandInfo);
+      }
+      else
+      throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
+                      "NOT_VALID_OPERATOR, expecting a ',' , but received '%s'\n", \
+                       opToken->str);
+    }
+    else
+    throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
+                    "NOT_VALID_IDENTIFIER, expecting a 'A'/'X'/'Y' , but received '%s'\n", \
+                     idToken->str);
+  }
+  else
+    throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
+                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                   idToken->type);
+}
 
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IntegerToken *intToken;
@@ -334,6 +365,89 @@ void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
    -- get indexX/indexY/longshortoff/longshortptrwithindex
   ''['' = get function ShortLongPtr
 */
+void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo){
+    if(isTokenMatchesString(instructionTocompare,"ADC"))
+      operandInfo->baseOpcode = 0x09;
+    else if(isTokenMatchesString(instructionTocompare,"ADD"))
+      operandInfo->baseOpcode = 0x0B;
+    else if(isTokenMatchesString(instructionTocompare,"AND"))
+      operandInfo->baseOpcode = 0x04;
+    else if(isTokenMatchesString(instructionTocompare,"BCP"))
+      operandInfo->baseOpcode = 0x05;
+    else if(isTokenMatchesString(instructionTocompare,"CP"))
+      operandInfo->baseOpcode = 0x01;
+    else if(isTokenMatchesString(instructionTocompare,"LD"))
+      operandInfo->baseOpcode = 0x06;
+    else if(isTokenMatchesString(instructionTocompare,"OR"))
+      operandInfo->baseOpcode = 0x0A;
+    else if(isTokenMatchesString(instructionTocompare,"SBC"))
+      operandInfo->baseOpcode = 0x02;
+    else if(isTokenMatchesString(instructionTocompare,"SUB"))
+      operandInfo->baseOpcode = 0x00;
+    else if(isTokenMatchesString(instructionTocompare,"XOR"))
+      operandInfo->baseOpcode = 0x08;
+    else if(isTokenMatchesString(instructionTocompare,"BREAK"))
+      operandInfo->baseOpcode = 0x8B;
+    else if(isTokenMatchesString(instructionTocompare,"CCF"))
+      operandInfo->baseOpcode = 0x8C;
+    else if(isTokenMatchesString(instructionTocompare,"HALT"))
+      operandInfo->baseOpcode = 0x8E;
+    else if(isTokenMatchesString(instructionTocompare,"IRET"))
+      operandInfo->baseOpcode = 0x80;
+    else if(isTokenMatchesString(instructionTocompare,"NOP"))
+      operandInfo->baseOpcode = 0x9D;
+    else if(isTokenMatchesString(instructionTocompare,"RCF"))
+      operandInfo->baseOpcode = 0x98;
+    else if(isTokenMatchesString(instructionTocompare,"RET"))
+      operandInfo->baseOpcode = 0x81;
+    else if(isTokenMatchesString(instructionTocompare,"RETF"))
+      operandInfo->baseOpcode = 0x87;
+    else if(isTokenMatchesString(instructionTocompare,"RIM"))
+      operandInfo->baseOpcode = 0x9A;
+    else if(isTokenMatchesString(instructionTocompare,"RVF"))
+      operandInfo->baseOpcode = 0x9C;
+    else if(isTokenMatchesString(instructionTocompare,"SCF"))
+      operandInfo->baseOpcode = 0x99;
+    else if(isTokenMatchesString(instructionTocompare,"SIM"))
+      operandInfo->baseOpcode = 0x9B;
+    else if(isTokenMatchesString(instructionTocompare,"TRAP"))
+      operandInfo->baseOpcode = 0x83;
+    else if(isTokenMatchesString(instructionTocompare,"WFI"))
+      operandInfo->baseOpcode = 0x8F;
+    else if(isTokenMatchesString(instructionTocompare,"CPLW"))
+      operandInfo->baseOpcode = 0x53;
+    else if(isTokenMatchesString(instructionTocompare,"DECW"))
+      operandInfo->baseOpcode = 0x5A;
+    else if(isTokenMatchesString(instructionTocompare,"INCW"))
+      operandInfo->baseOpcode = 0x5C;
+    else if(isTokenMatchesString(instructionTocompare,"NEGW"))
+      operandInfo->baseOpcode = 0x50;
+    else if(isTokenMatchesString(instructionTocompare,"POPW"))
+      operandInfo->baseOpcode = 0x85;
+    else if(isTokenMatchesString(instructionTocompare,"PUSH"))
+      operandInfo->baseOpcode = 0x89;
+    else if(isTokenMatchesString(instructionTocompare,"RLCW"))
+      operandInfo->baseOpcode = 0x59;
+    else if(isTokenMatchesString(instructionTocompare,"RLWA"))
+      operandInfo->baseOpcode = 0x02;
+    else if(isTokenMatchesString(instructionTocompare,"RRCW"))
+      operandInfo->baseOpcode = 0x56;
+    else if(isTokenMatchesString(instructionTocompare,"RRWA"))
+      operandInfo->baseOpcode = 0x01;
+    else if(isTokenMatchesString(instructionTocompare,"SLAW")||(isTokenMatchesString(instructionTocompare,"SLLW")))
+      operandInfo->baseOpcode = 0x58;
+    else if(isTokenMatchesString(instructionTocompare,"SRAW"))
+      operandInfo->baseOpcode = 0x57;
+    else if(isTokenMatchesString(instructionTocompare,"SRLW"))
+      operandInfo->baseOpcode = 0x54;
+    else if(isTokenMatchesString(instructionTocompare,"SWAPW"))
+      operandInfo->baseOpcode = 0x5E;
+    else if(isTokenMatchesString(instructionTocompare,"TNZW"))
+      operandInfo->baseOpcode = 0x5D;
+    else
+    Throw(createException("NOT_VALID_INSTRUCTION ,out of scope" \
+                           ,NOT_VALID_INSTRUCTION));
+}
 
 void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
     OperatorToken *opToken;
@@ -469,6 +583,17 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
     *memoryToWriteCode +=1;
     break;
 
+    case DirectX:
+    code[0] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=1;
+    break;
+
+    case DirectY:
+    code[0] = 0x90;
+    code[1] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=2;
+    break;
+
     default:
     Throw(createException("wrong operandInfo type (enum) < 25" \
                            ,NOT_VALID_OPREANDINFO_TYPE));
@@ -476,59 +601,6 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
 
 }
 
-void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo){
-    if(isTokenMatchesString(instructionTocompare,"ADC"))
-      operandInfo->baseOpcode = 0x09;
-    else if(isTokenMatchesString(instructionTocompare,"ADD"))
-      operandInfo->baseOpcode = 0x0B;
-    else if(isTokenMatchesString(instructionTocompare,"AND"))
-      operandInfo->baseOpcode = 0x04;
-    else if(isTokenMatchesString(instructionTocompare,"BCP"))
-      operandInfo->baseOpcode = 0x05;
-    else if(isTokenMatchesString(instructionTocompare,"CP"))
-      operandInfo->baseOpcode = 0x01;
-    else if(isTokenMatchesString(instructionTocompare,"LD"))
-      operandInfo->baseOpcode = 0x06;
-    else if(isTokenMatchesString(instructionTocompare,"OR"))
-      operandInfo->baseOpcode = 0x0A;
-    else if(isTokenMatchesString(instructionTocompare,"SBC"))
-      operandInfo->baseOpcode = 0x02;
-    else if(isTokenMatchesString(instructionTocompare,"SUB"))
-      operandInfo->baseOpcode = 0x00;
-    else if(isTokenMatchesString(instructionTocompare,"XOR"))
-      operandInfo->baseOpcode = 0x08;
-    else if(isTokenMatchesString(instructionTocompare,"BREAK"))
-      operandInfo->baseOpcode = 0x8B;
-    else if(isTokenMatchesString(instructionTocompare,"CCF"))
-      operandInfo->baseOpcode = 0x8C;
-    else if(isTokenMatchesString(instructionTocompare,"HALT"))
-      operandInfo->baseOpcode = 0x8E;
-    else if(isTokenMatchesString(instructionTocompare,"IRET"))
-      operandInfo->baseOpcode = 0x80;
-    else if(isTokenMatchesString(instructionTocompare,"NOP"))
-      operandInfo->baseOpcode = 0x9D;
-    else if(isTokenMatchesString(instructionTocompare,"RCF"))
-      operandInfo->baseOpcode = 0x98;
-    else if(isTokenMatchesString(instructionTocompare,"RET"))
-      operandInfo->baseOpcode = 0x81;
-    else if(isTokenMatchesString(instructionTocompare,"RETF"))
-      operandInfo->baseOpcode = 0x87;
-    else if(isTokenMatchesString(instructionTocompare,"RIM"))
-      operandInfo->baseOpcode = 0x9A;
-    else if(isTokenMatchesString(instructionTocompare,"RVF"))
-      operandInfo->baseOpcode = 0x9C;
-    else if(isTokenMatchesString(instructionTocompare,"SCF"))
-      operandInfo->baseOpcode = 0x99;
-    else if(isTokenMatchesString(instructionTocompare,"SIM"))
-      operandInfo->baseOpcode = 0x9B;
-    else if(isTokenMatchesString(instructionTocompare,"TRAP"))
-      operandInfo->baseOpcode = 0x83;
-    else if(isTokenMatchesString(instructionTocompare,"WFI"))
-      operandInfo->baseOpcode = 0x8F;
-    else
-    Throw(createException("NOT_VALID_INSTRUCTION ,out of scope" \
-                           ,NOT_VALID_INSTRUCTION));
-}
 /* this function is get build-in instruction
  like BREAK,CCF,HALT
 */
@@ -549,6 +621,7 @@ int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
                 "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
                  token->type);
 }
+
 /*this function is get the 1st 3 token to identify them
   use function identifyInstruction to change the baseOpcode
   such as ADD A, ADC A, SUB A, have different baseOpcode
@@ -564,28 +637,10 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
   if(token->type == TOKEN_IDENTIFIER_TYPE){
     idToken = (IdentifierToken *)token;
     identifyInstruction(idToken->str,&operandInfo);
-  //2nd token
-  idToken =(IdentifierToken *)getToken(tokenizer);
-  if(token->type == TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"A") == 0)){
-  //3rd token
-  opToken = (OperatorToken *)getToken(tokenizer);
-  if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0))
-  {
-    handleNEXTOperandMain(tokenizer,&operandInfo);
-    displayOpcode(memoryToWriteCode,&operandInfo);
+    CheckA_X_Y_index(tokenizer,&operandInfo,memoryToWriteCode);
   }
   else
-  throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
-                  "NOT_VALID_OPERATOR, expecting a ',' , but received '%s'\n", \
-                   opToken->str);
-  }
-  else
-  throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
-                  "NOT_VALID_IDENTIFIER, expecting a 'A' , but received '%s'\n", \
-                   idToken->str);
-  }
-  else
-    throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
-                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+  throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
+                  "WRONG_TOKEN_TYPE, expecting a IdentifierToken type but received '%d'\n", \
                    token->type);
-}
+  }
