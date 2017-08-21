@@ -37,7 +37,6 @@ void test_Check_X_Y_index_given_Another_Symbols_than_comma_expect_not_valid_oper
     freeException(ex);
 }
 
-*/
 void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
@@ -64,15 +63,15 @@ void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
   TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
   printf("0x%02x%02x\n",buffer[0],buffer[1]);
 }
+*/
 
-
-void test_function_comma_given_comma_expect_exception(void){
+void test_function_getcomma_given_comma_expect_notexception(void){
   CEXCEPTION_T ex;
   OperandInfo operandInfo;
 
   char *str = ",";
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,")",str};
+  OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,",",str};
   getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
 
   Try {
@@ -83,6 +82,24 @@ void test_function_comma_given_comma_expect_exception(void){
   }
     //freeException(ex);
 }
+void test_function_getcomma_given_dollar_expect_exception(void){
+  CEXCEPTION_T ex;
+  OperandInfo operandInfo;
+
+  char *str = "$";
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,"$",str};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
+
+  Try {
+    getCommaSymbol(tokenizer, &operandInfo);
+  }Catch(ex) {
+    dumpErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
+  }
+    freeException(ex);
+}
+
 void test_handledirect_indexXY_given_CPLW_X_expect_0x53(void){
     CEXCEPTION_T ex;
     uint8_t buffer[4] = {0,0,0,0};
