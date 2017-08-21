@@ -16,7 +16,7 @@ void tearDown(void)
 }
 
 /*--------- Function displayOpcode---------
-  *give baseOpcode = 0x09
+  *example: give baseOpcode = 0x09
   baseOpcode is depends on instruction
   test something which not in operandtype
 */
@@ -236,4 +236,3 @@ void test_FUNCTION_DISPLAYOPCODE_given_longptrY_expect_not_valid_operandtype(voi
       }
       freeException1(ex);
 }
-

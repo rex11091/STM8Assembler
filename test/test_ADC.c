@@ -21,7 +21,7 @@ void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "adc A,#$97";
+  char str[] = "adc A,#$55";
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADC",str};
   IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
   OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
@@ -40,7 +40,7 @@ void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
   assemble(str, &memoryToWriteCode);
   TEST_ASSERT_EQUAL_HEX(0x55A9,*(uint32_t *)buffer);
   TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-  //printf("instruction [%s] = 0x%02x%02x\n",str,buffer[0],buffer[1]);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
 }
 void test_asesemble_given_adc_long_mem_0xff55_expect_0xff55C9(void){
   uint8_t buffer[4] = {0,0,0,0};

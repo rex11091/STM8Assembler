@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdarg.h>
-#include "CException.h"
 #include "Exception.h"
+#include "CException.h"
 #include "Token.h"
 
 
@@ -45,13 +45,13 @@ void freeException1(Exception *e){
   free(e);
 }
 
-void dumpErrorMessage(CEXCEPTION_T ex, int lineNo) {
-  Token *token = (Token *)ex->data;
+void dumpErrorMessage(Exception *e, int lineNo) {
+  Token *token = (Token *)e->data;
   int i = token->length - 1;
   if(i < 0) i = 0;
 
   printf("Error %d:\n", lineNo);
-  printf("%s\n", ex->msg);
+  printf("%s\n", e->msg);
   printf("%s\n", token->originalStr);
   printf("%*s", token->startColumn + 1, "^");
   while(i--)

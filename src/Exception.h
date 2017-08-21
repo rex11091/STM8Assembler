@@ -1,6 +1,7 @@
 #ifndef Exception_H
 #define Exception_H
 #include "error.h"
+#include "CExceptionConfig.h"
 
 typedef struct Exception Exception;
 typedef Exception* ExceptionPtr;
@@ -14,7 +15,7 @@ Exception *createException(char *msg, int errorCode);
 void freeException(Exception *e);
 void dumpException(Exception *e);
 void freeException1(Exception *e);
-//void dumpErrorMessage(CEXCEPTION_T ex, int lineNo) ;
+void dumpErrorMessage(Exception *e, int lineNo) ;
 void throwException(int errorCode, void *data, char *message, ...);
 
 

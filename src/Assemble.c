@@ -11,47 +11,6 @@
 #include "Exception.h"
 
 
-/*
-void trt(Tokenizer *tokenizer,OperandInfo *operandInfo){
-  OperatorToken   *opToken;
-  IdentifierToken *idToken;
-
-  opToken = (OperatorToken *)getToken(tokenizer);
-    if(opToken->type ==TOKEN_OPERATOR_TYPE && (strcmp(opToken->str,".") ==0)){
-  idToken = (IdentifierToken *)getToken(tokenizer);
-    if(idToken->type ==TOKEN_IDENTIFIER_TYPE && (strcmp(idToken->str,"W") ==0)){
-  opToken = (OperatorToken *)getToken(tokenizer);
-    if(opToken->type !=TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,"]") !=0)){
-       throwException(NOT_VALID_OPERATOR, (void *)opToken,                     \
-                         "Invalid operand, expecting a ']', but received '%s'\n", \
-                          opToken->str);
-      }
-    }
-    else
-    throwException(NOT_VALID_OPERATOR, (void *)idToken,                     \
-                   "Invalid operand, expecting a 'W', but received '%s'\n", \
-                    idToken->str);
-    }
-    else
-    throwException(NOT_VALID_OPERATOR, (void *)opToken,                     \
-                   "Invalid operand, expecting a '.', but received '%s'\n", \
-                    opToken->str);
-}
-
-
-instructionTable[]= {
-  {"ADD", add},
-  {"ADC", adc},
-};
-
-void add(){
-  printf("AAAn");
-}
-
-void testABC(){
-  strcmp("ADD",instructionTable);
-}
-*/
 void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memoryToWriteCode){
   IdentifierToken *idToken;
   OperatorToken *opToken;
@@ -355,7 +314,9 @@ void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
                          opToken->str);
         }
     else
-      Throw(WRONG_TOKEN_TYPE);
+    throwException(WRONG_TOKEN_TYPE, (void *)opToken,                           \
+                    "WRONG_TOKEN_TYPE, expecting a (IdentifierToken/OperatorToken type) , but received '%d'\n", \
+                     opToken->type);
 }
 /*
   function handleNEXTOperandMain
