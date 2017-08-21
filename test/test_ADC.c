@@ -15,7 +15,31 @@ void setUp(void)
 void tearDown(void)
 {
 }
+void test_asesemble_given_adc_byte_0x55_change_to_fail_expect_Excpetion(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "adc A,!$55";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADC",str};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+  OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+  OperatorToken   HashToken ={TOKEN_OPERATOR_TYPE, 6,1,"!",str};
 
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
+
+  Try {
+  assemble(str, &memoryToWriteCode);
+  }Catch(ex) {
+  dumpErrorMessage(ex, 1);
+  }
+  freeException(ex);
+}
 void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;

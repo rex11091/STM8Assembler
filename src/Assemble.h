@@ -59,7 +59,10 @@ void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
 void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode);
+int handleDirect_X_Y_index(char *assemblyName, char **memoryToWriteCode);
 void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo,char **memoryToWriteCode);
+void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
+int try(char *assemblyName, char **memoryToWriteCode);
 
 #define isTokenMatchesString(token,str2cmp)  (strcmp(token,str2cmp )== 0)
 

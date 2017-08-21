@@ -14,67 +14,7 @@ void setUp(void)
 void tearDown(void)
 {
 }
-
-// test function CheckA_X_Y_index
-void test_Check_X_Y_index_given_X_baseOpcode_11_expect_directX_0x11(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD X,";
-  operandInfo.baseOpcode = 0x11;
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-
-  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
-  TEST_ASSERT_EQUAL(DirectX,operandInfo.type);
-  TEST_ASSERT_EQUAL_HEX(0x11,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[1],memoryToWriteCode);
-  printf("0x%02x\n",buffer[0]);
-}
-void test_Check_X_Y_index_given_Y_baseOpcode_11_expect_directY_0x1190(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD Y,";
-  operandInfo.baseOpcode = 0x11;
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-
-  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
-  TEST_ASSERT_EQUAL(DirectY,operandInfo.type);
-  TEST_ASSERT_EQUAL_HEX(0x1190,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-  printf("0x%02x%02x\n",buffer[0],buffer[1]);
-}
-void test_Check_X_Y_index_given_A_hashsymbol_going_handlebyte_expect_Byte(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "A,#$10";
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,0 ,1,"A",str};
-  OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,1 ,1,",",str};
-  OperatorToken HashToken = {TOKEN_OPERATOR_TYPE,2 ,1,"#",str};
-  OperatorToken DollarToken = {TOKEN_OPERATOR_TYPE,3 ,1,"$",str};
-  IntegerToken intToken = {TOKEN_INTEGER_TYPE,4 ,2,"0x10",str,0x10};
-
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&DollarToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
-
-  CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
-  TEST_ASSERT_EQUAL(BYTE,operandInfo.type);
-  TEST_ASSERT_EQUAL_HEX(0x10A0,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-  printf("0x%02x%02x\n",buffer[0],buffer[1]);
-}
+/*
 void test_Check_X_Y_index_given_Another_Symbols_than_comma_expect_not_valid_operator(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
@@ -96,45 +36,156 @@ void test_Check_X_Y_index_given_Another_Symbols_than_comma_expect_not_valid_oper
   }
     freeException(ex);
 }
-void test_Check_X_Y_index_given_Z_expect_not_valid_identifier(void){
+
+*/
+void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "adc A,#$55";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADC",str};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
+  OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+  OperatorToken   HashToken ={TOKEN_OPERATOR_TYPE, 6,1,"#",str};
+  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55",str,0x55};
+
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+  try(str, &memoryToWriteCode);
+  TEST_ASSERT_EQUAL_HEX(0x55A9,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
+}
+
+
+void test_function_comma_given_comma_expect_exception(void){
+  CEXCEPTION_T ex;
+  OperandInfo operandInfo;
+
+  char *str = ",";
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  OperatorToken CBracketToken = {TOKEN_OPERATOR_TYPE,0,1,")",str};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
+
+  Try {
+    getCommaSymbol(tokenizer, &operandInfo);
+  }Catch(ex) {
+    dumpErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
+  }
+    //freeException(ex);
+}
+void test_handledirect_indexXY_given_CPLW_X_expect_0x53(void){
+    CEXCEPTION_T ex;
+    uint8_t buffer[4] = {0,0,0,0};
+    char *memoryToWriteCode = buffer;
+    OperandInfo operandInfo;
+    Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+    char str[] = "CPLW X";
+
+    IdentifierToken idToken = {TOKEN_IDENTIFIER_TYPE,0 ,4,"CPLW",str};
+    IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,5 ,1,"X",str};
+
+    initTokenizer_ExpectAndReturn(str,tokenizer);
+    getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
+    getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+    handleDirect_X_Y_index(str, &memoryToWriteCode);
+    TEST_ASSERT_EQUAL_HEX(0x53,*(uint32_t *)buffer);
+    TEST_ASSERT_EQUAL_PTR(&buffer[1],memoryToWriteCode);
+    printf("0x%02x\n",buffer[0]);
+  }
+void test_handledirect_indexXY_given_CPLW_Y_expect_0x9053(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD Z,#$10";
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Z",str};
+  char str[] = "CPLW Y";
 
+  IdentifierToken idToken = {TOKEN_IDENTIFIER_TYPE,0 ,4,"CPLW",str};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,5 ,1,"Y",str};
+
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  handleDirect_X_Y_index(str, &memoryToWriteCode);
+  TEST_ASSERT_EQUAL_HEX(0x5390,*(uint32_t *)buffer);
+  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
+  printf("0x%02x%02x\n",buffer[0],buffer[1]);
+}
+void test_handledirect_indexXY_given_Z_expect_not_valid_identifier(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "CPLW Z";
+
+  IdentifierToken idToken = {TOKEN_IDENTIFIER_TYPE,0 ,4,"CPLW",str};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,5 ,1,"Z",str};
+
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
 
   Try {
-    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+  handleDirect_X_Y_index(str, &memoryToWriteCode);
   }Catch(ex) {
     dumpErrorMessage(ex,1);
     TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER,ex->errorCode);
   }
     freeException(ex);
 }
-void test_Check_X_Y_index_given_integerType_expect_Wrong_token_type(void){
+void test_handledirect_indexXY_given_CPLW_integerType_expect_Wrong_token_type(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD A,#$10";
-  IdentifierToken AToken = {TOKEN_INTEGER_TYPE,4 ,1,"A",str};
-
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-
+  char str[] = "CPLW Y";
+  IdentifierToken idToken = {TOKEN_INTEGER_TYPE,0 ,4,"CPLW",str};
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
   Try {
-    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
+    handleDirect_X_Y_index(str, &memoryToWriteCode);
   }Catch(ex) {
     dumpErrorMessage(ex,1);
     TEST_ASSERT_EQUAL(WRONG_TOKEN_TYPE,ex->errorCode);
   }
     freeException(ex);
 }
+void test_handledirect_indexXY_given_X_integerType_expect_Wrong_token_type(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "CPLW Y";
+  IdentifierToken idToken = {TOKEN_IDENTIFIER_TYPE,0 ,4,"CPLW",str};
+  IdentifierToken AToken = {TOKEN_INTEGER_TYPE,5 ,1,"Y",str};
 
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  Try {
+    handleDirect_X_Y_index(str, &memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex,1);
+    TEST_ASSERT_EQUAL(WRONG_TOKEN_TYPE,ex->errorCode);
+  }
+    freeException(ex);
+}
 
 //test function getLongShortType
 void test_function_getlongshortType_given_0x97_expect_short_16(void){

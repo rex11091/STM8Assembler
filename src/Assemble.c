@@ -11,20 +11,106 @@
 #include "Exception.h"
 
 
+int try(char *assemblyName, char **memoryToWriteCode){
+  assemblyName = convertToUpperCase(assemblyName);
+  Tokenizer *tokenizer = initTokenizer(assemblyName);
+  Token *token = getToken(tokenizer);
+  IdentifierToken *idToken;
+  OperatorToken *opToken;
+  OperandInfo operandInfo;
+  //1st token
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+    idToken = (IdentifierToken *)token;
+    identifyInstruction(idToken->str,&operandInfo);
+    getA_X_Y_index(tokenizer,&operandInfo);
+    displayOpcode(memoryToWriteCode,&operandInfo);
+  }
+  else
+  throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
+                  "WRONG_TOKEN_TYPE, expecting a IdentifierToken type but received '%d'\n", \
+                   token->type);
+}
+void getA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo){
+  IdentifierToken *idToken;
+  OperatorToken *opToken;
+  idToken =(IdentifierToken *)getToken(tokenizer);
+  if(idToken->type == TOKEN_IDENTIFIER_TYPE){
+    if(isTokenMatchesString(idToken->str,"A")){
+      getCommaSymbol(tokenizer,operandInfo);
+      handleNEXTOperandMain(tokenizer,operandInfo);
+     }
+    else if(isTokenMatchesString(idToken->str,"X")){
+      getCommaSymbol(tokenizer,operandInfo);
+      handleNEXTOperandMain(tokenizer,operandInfo);
+    }
+    else if(isTokenMatchesString(idToken->str,"Y")){
+      getCommaSymbol(tokenizer,operandInfo);
+      handleNEXTOperandMain(tokenizer,operandInfo);
+    }
+    else
+    throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
+                    "NOT_VALID_IDENTIFIER, expecting a 'A'/'X'/'Y' , but received '%s'\n", \
+                     idToken->str);
+  }
+  else
+    throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
+                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                   idToken->type);
+}
+
+
+void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo){
+  OperatorToken *opToken;
+  opToken = (OperatorToken *)getToken(tokenizer);
+  if(opToken->type != TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,",") !=0))
+     throwException(NOT_VALID_OPERATOR, (void *)opToken,                     \
+                       "NOT_VALID_OPERATOR, expecting a ',', but received '%s'\n", \
+                        opToken->str);
+ }
+
+int handleDirect_X_Y_index(char *assemblyName, char **memoryToWriteCode){
+  assemblyName = convertToUpperCase(assemblyName);
+  Tokenizer *tokenizer = initTokenizer(assemblyName);
+  Token *token = getToken(tokenizer);
+  IdentifierToken *idToken;
+  OperatorToken *opToken;
+  OperandInfo operandInfo;
+  if(token->type == TOKEN_IDENTIFIER_TYPE){
+    idToken = (IdentifierToken *)token;
+    identifyInstruction(idToken->str,&operandInfo);
+  idToken =(IdentifierToken *)getToken(tokenizer);
+    if(idToken->type == TOKEN_IDENTIFIER_TYPE){
+      if(isTokenMatchesString(idToken->str,"X")){
+          operandInfo.type = DirectX;
+          displayOpcode(memoryToWriteCode,&operandInfo);
+        }
+      else if(isTokenMatchesString(idToken->str,"Y")){
+          operandInfo.type = DirectY;
+          displayOpcode(memoryToWriteCode,&operandInfo);
+        }
+      else{
+      throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
+                      "NOT_VALID_IDENTIFIER, expecting a 'X'/'Y' , but received '%s'\n", \
+                       idToken->str);
+          }
+    }
+    else
+    throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
+                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                   idToken->type);
+  }
+  else
+  throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
+                  "WRONG_TOKEN_TYPE, expecting a IdentifierToken type but received '%d'\n", \
+                   token->type);
+}
+
 void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memoryToWriteCode){
   IdentifierToken *idToken;
   OperatorToken *opToken;
   idToken =(IdentifierToken *)getToken(tokenizer);
   if(idToken->type == TOKEN_IDENTIFIER_TYPE){
-    if(isTokenMatchesString(idToken->str,"X")){
-      operandInfo->type = DirectX;
-      displayOpcode(memoryToWriteCode,operandInfo);
-    }
-    else if(isTokenMatchesString(idToken->str,"Y")){
-      operandInfo->type = DirectY;
-      displayOpcode(memoryToWriteCode,operandInfo);
-    }
-    else if(isTokenMatchesString(idToken->str,"A")){
+    if(isTokenMatchesString(idToken->str,"A")){
       opToken = (OperatorToken *)getToken(tokenizer);
       if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0)){
         handleNEXTOperandMain(tokenizer,operandInfo);
@@ -598,10 +684,31 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
   if(token->type == TOKEN_IDENTIFIER_TYPE){
     idToken = (IdentifierToken *)token;
     identifyInstruction(idToken->str,&operandInfo);
-    CheckA_X_Y_index(tokenizer,&operandInfo,memoryToWriteCode);
+    idToken =(IdentifierToken *)getToken(tokenizer);
+    if(idToken->type == TOKEN_IDENTIFIER_TYPE){
+      if(isTokenMatchesString(idToken->str,"A")){
+        opToken = (OperatorToken *)getToken(tokenizer);
+        if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0)){
+          handleNEXTOperandMain(tokenizer,&operandInfo);
+          displayOpcode(memoryToWriteCode,&operandInfo);
+        }
+        else
+        throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
+                        "NOT_VALID_OPERATOR, expecting a ',' , but received '%s'\n", \
+                         opToken->str);
+      }
+      else
+      throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
+                      "NOT_VALID_IDENTIFIER, expecting a 'A' , but received '%s'\n", \
+                       idToken->str);
+    }
+    else
+      throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
+                    "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                     idToken->type);
   }
   else
   throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
                   "WRONG_TOKEN_TYPE, expecting a IdentifierToken type but received '%d'\n", \
                    token->type);
-  }
+}
