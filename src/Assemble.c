@@ -23,7 +23,7 @@ int try(char *assemblyName, char **memoryToWriteCode){
     idToken = (IdentifierToken *)token;
     identifyInstruction(idToken->str,&operandInfo);
     getA_X_Y_index(tokenizer,&operandInfo);
-    displayOpcode(memoryToWriteCode,&operandInfo);
+    displayOpcodeAA(memoryToWriteCode,&operandInfo);
   }
   else
   throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
@@ -58,6 +58,7 @@ void getA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo){
                    idToken->type);
 }
 */
+
 void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo){
   OperatorToken *opToken;
   opToken = (OperatorToken *)getToken(tokenizer);
@@ -76,7 +77,7 @@ void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memo
       opToken = (OperatorToken *)getToken(tokenizer);
       if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0)){
         handleNEXTOperandMain(tokenizer,operandInfo);
-        displayOpcode(memoryToWriteCode,operandInfo);
+        displayOpcodeA(memoryToWriteCode,operandInfo);
       }
       else
       throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \
@@ -484,7 +485,134 @@ void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo){
                     opToken->type);
 }
 
-void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo){
+void displayOpcodeA(char **memoryToWriteCode,OperandInfo *operandInfo){
+  uint8_t *code = *memoryToWriteCode;
+  switch (operandInfo->type) {
+    case LONG_MEM:
+    code[0] = operandInfo->baseOpcode + 0xC0;
+    code[1] = (operandInfo->value >> 8 ) & 0xff;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+    case SHORT_MEM:
+    code[0] = operandInfo->baseOpcode + 0xB0;
+    code[1] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=2;
+    break;
+
+    case BYTE:
+    code[0] = operandInfo->baseOpcode + 0xA0;
+    code[1] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=2;
+    break;
+
+    case IndexX:
+    code[0] = operandInfo->baseOpcode + 0xF0;
+    *memoryToWriteCode +=1;
+    break;
+
+    case IndexY:
+    code[0] = 0x90;
+    code[1] = operandInfo->baseOpcode + 0xF0;
+    *memoryToWriteCode +=2;
+    break;
+
+    case SHORTOFF_X:
+    code[0] = operandInfo->baseOpcode + 0xE0;
+    code[1] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=2;
+    break;
+
+    case SHORTOFF_Y:
+    code[0] = 0x90;
+    code[1] = operandInfo->baseOpcode + 0xE0;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+
+    case LONGOFF_X:
+    code[0] = operandInfo->baseOpcode + 0xD0;
+    code[1] = (operandInfo->value >> 8 ) & 0xff;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+
+    case LONGOFF_Y:
+    code[0] = 0x90;
+    code[1] = operandInfo->baseOpcode + 0xD0;
+    code[2] = (operandInfo->value >> 8 ) & 0xff;
+    code[3] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=4;
+    break;
+
+    case SHORTOFF_SP:
+    code[0] = operandInfo->baseOpcode + 0x10;
+    code[1] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=2;
+    break;
+
+    case SHORTPTR:
+    code[0] = 0x92;
+    code[1] = operandInfo->baseOpcode + 0xC0;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+
+    case LONGPTR:
+    code[0] = 0x72;
+    code[1] = operandInfo->baseOpcode + 0xC0;
+    code[2] = (operandInfo->value >> 8 ) & 0xff;
+    code[3] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=4;
+    break;
+
+    case SHORTPTR_X:
+    code[0] = 0x92;
+    code[1] = operandInfo->baseOpcode + 0xD0;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+
+    case SHORTPTR_Y:
+    code[0] = 0x91;
+    code[1] = operandInfo->baseOpcode + 0xD0;
+    code[2] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=3;
+    break;
+
+    case LONGPTR_X:
+    code[0] = 0x72;
+    code[1] = operandInfo->baseOpcode + 0xD0;
+    code[2] = (operandInfo->value >> 8 ) & 0xff;
+    code[3] = operandInfo->value & 0xff;
+    *memoryToWriteCode +=4;
+    break;
+
+    case Inherent:
+    code[0] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=1;
+    break;
+
+    case DirectX:
+    code[0] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=1;
+    break;
+
+    case DirectY:
+    code[0] = 0x90;
+    code[1] = operandInfo->baseOpcode;
+    *memoryToWriteCode +=2;
+    break;
+
+    default:
+    Throw(createException("wrong operandInfo type (enum) < 25" \
+                           ,NOT_VALID_OPREANDINFO_TYPE));
+  }
+
+}
+
+
+void displayOpcodeAXorY(char **memoryToWriteCode,OperandInfo *operandInfo){
   uint8_t *code = *memoryToWriteCode;
   switch (operandInfo->type) {
     case LONG_MEM:
@@ -627,11 +755,11 @@ int handleDirect_X_Y_index(char *assemblyName, char **memoryToWriteCode){
     if(idToken->type == TOKEN_IDENTIFIER_TYPE){
       if(isTokenMatchesString(idToken->str,"X")){
           operandInfo.type = DirectX;
-          displayOpcode(memoryToWriteCode,&operandInfo);
+          displayOpcodeA(memoryToWriteCode,&operandInfo);
         }
       else if(isTokenMatchesString(idToken->str,"Y")){
           operandInfo.type = DirectY;
-          displayOpcode(memoryToWriteCode,&operandInfo);
+          displayOpcodeA(memoryToWriteCode,&operandInfo);
         }
       else{
       throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
@@ -663,7 +791,7 @@ int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
     idToken = (IdentifierToken *)token;
     identifyInstruction(idToken->str,&operandInfo);
     operandInfo.type = Inherent;
-    displayOpcode(memoryToWriteCode,&operandInfo);
+    displayOpcodeA(memoryToWriteCode,&operandInfo);
   }
   else
   throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
@@ -692,7 +820,7 @@ int assemble(char *assemblyName, char **memoryToWriteCode){
         opToken = (OperatorToken *)getToken(tokenizer);
         if(opToken->type == TOKEN_OPERATOR_TYPE && (strcmp(",",opToken->str )==0)){
           handleNEXTOperandMain(tokenizer,&operandInfo);
-          displayOpcode(memoryToWriteCode,&operandInfo);
+          displayOpcodeA(memoryToWriteCode,&operandInfo);
         }
         else
         throwException(NOT_VALID_OPERATOR, (void *)opToken,                           \

@@ -29,6 +29,10 @@ typedef enum{
   Inherent,
   DirectX,
   DirectY,
+  XShort_mem,
+  XLong_mem,
+  XIndexY,
+  Xlongoff+,
 }OperandType;
 typedef struct OperandInfo OperandInfo;
 struct OperandInfo{
@@ -55,7 +59,8 @@ void handleByte(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
-void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
+void displayOpcodeA(char **memoryToWriteCode,OperandInfo *operandInfo);
+void displayOpcodeAXorY(char **memoryToWriteCode,OperandInfo *operandInfo);
 void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode);
