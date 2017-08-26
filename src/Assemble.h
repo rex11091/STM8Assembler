@@ -32,7 +32,7 @@ typedef enum{
   XShort_mem,
   XLong_mem,
   XIndexY,
-  Xlongoff+,
+  Xlongoff,
 }OperandType;
 typedef struct OperandInfo OperandInfo;
 struct OperandInfo{

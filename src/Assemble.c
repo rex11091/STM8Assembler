@@ -57,17 +57,6 @@ void getA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo){
                   "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
                    idToken->type);
 }
-*/
-
-void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo){
-  OperatorToken *opToken;
-  opToken = (OperatorToken *)getToken(tokenizer);
-  if(opToken->type != TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,",") !=0))
-     throwException(NOT_VALID_OPERATOR, (void *)opToken,                     \
-                       "NOT_VALID_OPERATOR, expecting a ',', but received '%s'\n", \
-                        opToken->str);
- }
-
 void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memoryToWriteCode){
   IdentifierToken *idToken;
   OperatorToken *opToken;
@@ -84,7 +73,7 @@ void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memo
                       "NOT_VALID_OPERATOR, expecting a ',' , but received '%s'\n", \
                        opToken->str);
     }
-    else
+    elsec
     throwException(NOT_VALID_IDENTIFIER, (void *)idToken,                           \
                     "NOT_VALID_IDENTIFIER, expecting a 'A'/'X'/'Y' , but received '%s'\n", \
                      idToken->str);
@@ -94,6 +83,16 @@ void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo, char **memo
                   "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
                    idToken->type);
 }
+*/
+
+void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo){
+  OperatorToken *opToken;
+  opToken = (OperatorToken *)getToken(tokenizer);
+  if(opToken->type != TOKEN_OPERATOR_TYPE || (strcmp(opToken->str,",") !=0))
+     throwException(NOT_VALID_OPERATOR, (void *)opToken,                     \
+                       "NOT_VALID_OPERATOR, expecting a ',', but received '%s'\n", \
+                        opToken->str);
+ }
 
 void getLongShortType(Tokenizer *tokenizer,OperandInfo *operandInfo){
     IntegerToken *intToken;
