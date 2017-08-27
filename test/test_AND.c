@@ -16,6 +16,35 @@ void tearDown(void)
 }
 
 //test AND
+void test_asesemble_given_and_index_Z_expect_Exception(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "and A,(Z)";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"AND",str};
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 6,1,"(",str};
+  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,7 ,1,"Z",str};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&OBracketToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&XToken);
+
+  Try {
+    assemble(str, &memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER,ex->errorCode);
+  }
+    freeException(ex);
+}
+
 void test_asesemble_given_and_byte_0x55_expect_0x55A4(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
@@ -52,8 +81,8 @@ void test_asesemble_given_and_long_mem_0xff55_expect_0xff55C4(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"AND",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55ff",str,0x55ff};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,4,"0x55ff",str,0x55ff};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
@@ -77,8 +106,8 @@ void test_asesemble_given_and_short_mem_0x55_expect_0x55B4(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"AND",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,2,"0x55",str,0x55};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"0x55",str,0x55};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);

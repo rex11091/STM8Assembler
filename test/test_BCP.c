@@ -16,6 +16,41 @@ void tearDown(void)
 }
 
 //test BCP
+void test_asesemble_given_BCP_longoff_X_change_to_fail_expect_Exception(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "BCP A,($1088,X;";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"BCP",str};
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 6,1,"(",str};
+  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
+  IntegerToken    intToken = {TOKEN_INTEGER_TYPE, 8,4,"0x1088",str,0x1088};
+  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 12,1,",",str};
+  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE, 13,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 14,1,";",str};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&OBracketToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&comma1Token);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&WToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
+  Try {
+    	assemble(str, &memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
+  }
+    freeException(ex);
+}
 void test_asesemble_given_BCP_byte_0x55_expect_0x55A5(void){
   uint8_t buffer[4] = {0,0,0,0};
   char *memoryToWriteCode = buffer;
@@ -52,8 +87,8 @@ void test_asesemble_given_BCP_long_mem_0xff55_expect_0xff55C5(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"BCP",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55ff",str,0x55ff};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,4,"0x55ff",str,0x55ff};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
@@ -77,8 +112,8 @@ void test_asesemble_given_BCP_short_mem_0x55_expect_0x55B5(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"BCP",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,2,"0x55",str,0x55};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"0x55",str,0x55};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
@@ -103,8 +138,8 @@ void test_asesemble_given_BCP_index_X_expect_0xF5(void){
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
-  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,8 ,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 9,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -124,13 +159,13 @@ void test_asesemble_given_BCP_index_Y_expect_0xF590(void){
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "BCP A,(X)";
+  char str[] = "BCP A,(Y)";
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"BCP",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
-  IdentifierToken YToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  IdentifierToken YToken = {TOKEN_IDENTIFIER_TYPE,8 ,1,"Y",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 9,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -158,9 +193,9 @@ void test_asesemble_given_BCP_shortoff_index_X_expect_0x10E5(void){
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
   OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 8,1,"$",str};
   IntegerToken    intToken = {TOKEN_INTEGER_TYPE,9,2,"0x10",str,0x10};
-  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 8,1,",",str};
-  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 10,1,",",str};
+  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,11 ,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 12,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -191,9 +226,9 @@ void test_asesemble_given_BCP_shortoff_index_Y_expect_0x10E590(void){
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
   OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 8,1,"$",str};
   IntegerToken    intToken = {TOKEN_INTEGER_TYPE,9,2,"0x10",str,0x10};
-  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 8,1,",",str};
-  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 10,1,",",str};
+  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,11 ,1,"Y",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 12,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -217,7 +252,7 @@ void test_asesemble_given_BCP_longoff_index_X_expect_0x8810D5(void){
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "BCPA,($1088,X)";
+  char str[] = "BCP A,($1088,X)";
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"BCP",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};

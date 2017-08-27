@@ -15,6 +15,30 @@ void tearDown(void)
 {
 }
 
+
+
+void test_function_inherent_given_others_instruction_expect_Not_valid_instruction(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "ZZZ";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,5,"ZZZ",str};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+
+  Try {
+      handleInherentInstruction(str, &memoryToWriteCode);
+  }Catch(ex)
+    {
+    dumpException(ex);
+    TEST_ASSERT_EQUAL(NOT_VALID_INSTRUCTION,ex->errorCode);
+    }
+    freeException1(ex);
+}
+
 void test_handleinherentInstruction_given_Break_expect_8B(void){
   CEXCEPTION_T ex;
   uint8_t buffer[4] = {0,0,0,0};

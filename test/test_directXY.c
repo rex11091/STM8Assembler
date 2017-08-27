@@ -15,6 +15,30 @@ void tearDown(void)
 {
 }
 
+void test_handleDirect_X_Y_index_directX_CPLW_W_expect_exception(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "CPLW W";
+
+  IdentifierToken idToken = {TOKEN_IDENTIFIER_TYPE,0 ,4,"CPLW",str};
+  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,5 ,1,"W",str};
+
+  initTokenizer_ExpectAndReturn(str,tokenizer);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&idToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+
+  Try {
+  handleDirect_X_Y_index(str, &memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex,1);
+    TEST_ASSERT_EQUAL(NOT_VALID_IDENTIFIER,ex->errorCode);
+  }
+    freeException(ex);
+}
+
 
 void test_handleDirect_X_Y_index_directX_CPLW_X_expect_0x53(void){
   CEXCEPTION_T ex;

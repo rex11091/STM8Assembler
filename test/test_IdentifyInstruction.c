@@ -297,6 +297,20 @@ void test_function_identifyInstruction_given_TNZW_expect_baseOpcode_5D(void){
   TEST_ASSERT_EQUAL_HEX(0x5D,operandInfo.baseOpcode);
 }
 
+void test_function_identifyInstruction_given_CPW_expect_baseOpcode_0x03(void){
+  char *str = "CPW";
+  OperandInfo operandInfo;
+  identifyInstruction(str,&operandInfo);
+  printf("0x%02x\n",operandInfo.baseOpcode );
+  TEST_ASSERT_EQUAL_HEX(0x03,operandInfo.baseOpcode);
+}
+void test_function_identifyInstruction_given_LDW_expect_baseOpcode_0x0E(void){
+  char *str = "LDW";
+  OperandInfo operandInfo;
+  identifyInstruction(str,&operandInfo);
+  printf("0x%02x\n",operandInfo.baseOpcode );
+  TEST_ASSERT_EQUAL_HEX(0x0E,operandInfo.baseOpcode);
+}
 void test_function_identifyInstruction_given_others_instruction_expect_Not_valid_instruction(void){
   CEXCEPTION_T ex;
   char *str = "ZZZ";

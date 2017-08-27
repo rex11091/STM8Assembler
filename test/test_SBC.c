@@ -52,8 +52,8 @@ void test_asesemble_given_SBC_long_mem_0xff55_expect_0xff55C2(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"SBC",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55ff",str,0x55ff};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,4,"0x55ff",str,0x55ff};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
@@ -77,8 +77,8 @@ void test_asesemble_given_SBC_short_mem_0x55_expect_0x55B2(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"SBC",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-	IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,2,"0x55",str,0x55};
+	OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 6,1,"$",str};
+	IntegerToken intToken = {TOKEN_INTEGER_TYPE,7,2,"0x55",str,0x55};
 
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
@@ -102,9 +102,9 @@ void test_asesemble_given_SBC_index_X_expect_0xF2(void){
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"SBC",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
-  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 6,1,"(",str};
+  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,7 ,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 8,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -124,13 +124,13 @@ void test_asesemble_given_SBC_index_Y_expect_0xF290(void){
   char *memoryToWriteCode = buffer;
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "SBC A,(X)";
+  char str[] = "SBC A,(Y)";
   IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"SBC",str};
 	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
 	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
-  IdentifierToken YToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 6,1,"(",str};
+  IdentifierToken YToken = {TOKEN_IDENTIFIER_TYPE,7 ,1,"Y",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 8,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -158,9 +158,9 @@ void test_asesemble_given_SBC_shortoff_index_X_expect_0x10E2(void){
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
   OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 8,1,"$",str};
   IntegerToken    intToken = {TOKEN_INTEGER_TYPE,9,2,"0x10",str,0x10};
-  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 8,1,",",str};
-  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 10,1,",",str};
+  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,11 ,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 12,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -191,9 +191,9 @@ void test_asesemble_given_SBC_shortoff_index_Y_expect_0x10E290(void){
 	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,"(",str};
   OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 8,1,"$",str};
   IntegerToken    intToken = {TOKEN_INTEGER_TYPE,9,2,"0x10",str,0x10};
-  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 8,1,",",str};
-  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"Y",str};
-  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 7,1,")",str};
+  OperatorToken   comma1Token ={TOKEN_OPERATOR_TYPE, 10,1,",",str};
+  IdentifierToken WToken = {TOKEN_IDENTIFIER_TYPE,11 ,1,"Y",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 12,1,")",str};
 
 	initTokenizer_ExpectAndReturn(str,tokenizer);
 	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
@@ -493,4 +493,36 @@ void test_asesemble_given_SBC_longptr_index_X_expect_0x5545D272(void){
   TEST_ASSERT_EQUAL_PTR(&buffer[4],memoryToWriteCode);
   printf("0x%02x%02x%02x%02x\n",buffer[0],buffer[1],buffer[2],buffer[3]);
 
+}
+
+void test_asesemble_given_SBC_index_X_change_to_fail_expect_exception(void){
+  CEXCEPTION_T ex;
+  uint8_t buffer[4] = {0,0,0,0};
+  char *memoryToWriteCode = buffer;
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+  char str[] = "SBC A,(X)";
+  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"SBC",str};
+	IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
+	OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
+	OperatorToken   OBracketToken ={TOKEN_OPERATOR_TYPE, 6,1,"(",str};
+  IdentifierToken XToken = {TOKEN_IDENTIFIER_TYPE,7 ,1,"X",str};
+  OperatorToken   CBracketToken ={TOKEN_OPERATOR_TYPE, 8,1,"+",str};
+
+	initTokenizer_ExpectAndReturn(str,tokenizer);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&OBracketToken);
+	getToken_ExpectAndReturn(tokenizer, (Token *)&XToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&CBracketToken);
+
+
+  Try {
+    assemble(str, &memoryToWriteCode);
+  }Catch(ex) {
+    dumpErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
+  }
+    freeException(ex);
 }

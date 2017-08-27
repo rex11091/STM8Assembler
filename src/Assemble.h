@@ -29,10 +29,11 @@ typedef enum{
   Inherent,
   DirectX,
   DirectY,
-  XShort_mem,
-  XLong_mem,
-  XIndexY,
-  Xlongoff,
+  YLONG_MEM,
+  YSHORT_MEM,
+  YSHORTPTR,
+  WORD,
+  YWORD,
 }OperandType;
 typedef struct OperandInfo OperandInfo;
 struct OperandInfo{
@@ -55,20 +56,19 @@ void handleShortLongPtrorWithIndex(Tokenizer *tokenizer,OperandInfo *operandInfo
 void getShortlongoffIndexX_Y_SP(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void convertShortoffToLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleShortLongoff(Tokenizer *tokenizer,OperandInfo *operandInfo);
-void handleByte(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void handleByteOrWord(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleLongShortMem(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleNExt_2_OperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
 void handleNEXTOperandMain(Tokenizer *tokenizer,OperandInfo *operandInfo);
-void displayOpcodeA(char **memoryToWriteCode,OperandInfo *operandInfo);
-void displayOpcodeAXorY(char **memoryToWriteCode,OperandInfo *operandInfo);
+void displayOpcode(char **memoryToWriteCode,OperandInfo *operandInfo);
 void identifyInstruction(char *instructionTocompare,OperandInfo *operandInfo);
 int assemble(char *assemblyName, char **memoryToWriteCode);
 int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode);
 int handleDirect_X_Y_index(char *assemblyName, char **memoryToWriteCode);
 void CheckA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo,char **memoryToWriteCode);
 void getCommaSymbol(Tokenizer *tokenizer,OperandInfo *operandInfo);
-int try(char *assemblyName, char **memoryToWriteCode);
-
+void getA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo);
+void ConvertOperandTypeOfYindex(Tokenizer *tokenizer,OperandInfo *operandInfo);
 #define isTokenMatchesString(token,str2cmp)  (strcmp(token,str2cmp )== 0)
 
 #endif // _TESTING_H

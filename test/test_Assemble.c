@@ -14,56 +14,6 @@ void setUp(void)
 void tearDown(void)
 {
 }
-/*
-void test_Check_X_Y_index_given_Another_Symbols_than_comma_expect_not_valid_operator(void){
-  CEXCEPTION_T ex;
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "ADD A*#$10";
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"A",str};
-  OperatorToken commaToken = {TOKEN_OPERATOR_TYPE,5 ,1,"*",str};
-
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&commaToken);
-
-  Try {
-    CheckA_X_Y_index(tokenizer,&operandInfo,&memoryToWriteCode);
-  }Catch(ex) {
-    dumpErrorMessage(ex,1);
-    TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
-  }
-    freeException(ex);
-}
-
-void test_asesemble_given_adc_byte_0x55_expect_0x55A9(void){
-  uint8_t buffer[4] = {0,0,0,0};
-  char *memoryToWriteCode = buffer;
-  OperandInfo operandInfo;
-  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-  char str[] = "adc A,#$55";
-  IdentifierToken ADDToken = {TOKEN_IDENTIFIER_TYPE, 0,3,"ADC",str};
-  IdentifierToken AToken = {TOKEN_IDENTIFIER_TYPE,4 ,1,"X",str};
-  OperatorToken   CommaToken ={TOKEN_OPERATOR_TYPE, 5,1,",",str};
-  OperatorToken   HashToken ={TOKEN_OPERATOR_TYPE, 6,1,"#",str};
-  OperatorToken   dollarToken ={TOKEN_OPERATOR_TYPE, 7,1,"$",str};
-  IntegerToken intToken = {TOKEN_INTEGER_TYPE,8,4,"0x55",str,0x55};
-
-  initTokenizer_ExpectAndReturn(str,tokenizer);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&ADDToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&AToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&CommaToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&HashToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
-  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
-
-  try(str, &memoryToWriteCode);
-  TEST_ASSERT_EQUAL_HEX(0x55A9,*(uint32_t *)buffer);
-  TEST_ASSERT_EQUAL_PTR(&buffer[2],memoryToWriteCode);
-  printf("0x%02x%02x\n",buffer[0],buffer[1]);
-}
-*/
 
 void test_function_getcomma_given_comma_expect_notexception(void){
   CEXCEPTION_T ex;
@@ -898,7 +848,7 @@ void test_function_handleLongShortoff_given_Lonfoff_0xfffff_Y_expect_LIMIT_EXCEE
 
 
 //test function handle byte
-void test_function_handlebyte_given_comma_replace_dollarSymbol_expect_NOT_VALID_OEPERATOR(void){
+void test_function_handleByteOrWord_given_comma_replace_dollarSymbol_expect_NOT_VALID_OEPERATOR(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -907,33 +857,33 @@ void test_function_handlebyte_given_comma_replace_dollarSymbol_expect_NOT_VALID_
     getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
 
     Try {
-      handleByte(tokenizer, &operandInfo);
+      handleByteOrWord(tokenizer, &operandInfo);
     }Catch(ex) {
       dumpErrorMessage(ex, 1);
       TEST_ASSERT_EQUAL(NOT_VALID_OPERATOR,ex->errorCode);
     }
       freeException(ex);
 }
-void test_function_handlebyte_given_0xFF1_expect_Limit_EXCEEDED(void){
+void test_function_handleByteOrWord_given_0xFFdd1_expect_Limit_EXCEEDED(void){
     CEXCEPTION_T ex;
     OperandInfo operandInfo;
     Tokenizer *tokenizer = (Tokenizer *)0x0badface;
-    char *str = "$0xff1";
+    char *str = "$0xffdd1";
 
     OperatorToken   dollarToken = {TOKEN_OPERATOR_TYPE, 0,1,"$",str};
-    IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,5,"0xff1",str,0xff1};
+    IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,5,"0xffdd1",str,0xffdd1};
     getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
     getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
     Try {
-      handleByte(tokenizer, &operandInfo);
+      handleByteOrWord(tokenizer, &operandInfo);
     }Catch(ex) {
       dumpErrorMessage(ex, 1);
       TEST_ASSERT_EQUAL(LIMIT_EXCEEDED,ex->errorCode);
     }
       freeException(ex);
   }
-void test_function_handlebyte_given_identifierTokenType_expect_Wrong_Token_type(void){
+void test_function_handleByteOrWord_given_identifierTokenType_expect_Wrong_Token_type(void){
       CEXCEPTION_T ex;
       OperandInfo operandInfo;
       Tokenizer *tokenizer = (Tokenizer *)0x0badface;
@@ -945,14 +895,27 @@ void test_function_handlebyte_given_identifierTokenType_expect_Wrong_Token_type(
       getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
       Try {
-        handleByte(tokenizer, &operandInfo);
+        handleByteOrWord(tokenizer, &operandInfo);
       }Catch(ex) {
         dumpErrorMessage(ex, 1);
         TEST_ASSERT_EQUAL(WRONG_TOKEN_TYPE,ex->errorCode);
       }
         freeException(ex);
     }
-void test_function_handlebyte_given_0xFF_expect_BYTE(void){
+void test_function_handleByteOrWord_given_0xFFff_expect_WORD(void){
+  OperandInfo operandInfo;
+  Tokenizer *tokenizer = (Tokenizer *)0x0badface;
+
+  char *str = "$0xffff";
+  OperatorToken   dollarToken = {TOKEN_OPERATOR_TYPE, 0,1,"$",str};
+  IntegerToken intToken = {TOKEN_INTEGER_TYPE,1,5,"0xffff",str,0xffff};
+  getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
+  getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
+
+  handleByteOrWord(tokenizer, &operandInfo);
+  TEST_ASSERT_EQUAL(WORD, operandInfo.type);
+}
+void test_function_handleByteOrWord_given_0xFF_expect_BYTE(void){
   OperandInfo operandInfo;
   Tokenizer *tokenizer = (Tokenizer *)0x0badface;
 
@@ -962,7 +925,7 @@ void test_function_handlebyte_given_0xFF_expect_BYTE(void){
   getToken_ExpectAndReturn(tokenizer, (Token *)&dollarToken);
   getToken_ExpectAndReturn(tokenizer, (Token *)&intToken);
 
-  handleByte(tokenizer, &operandInfo);
+  handleByteOrWord(tokenizer, &operandInfo);
   TEST_ASSERT_EQUAL(BYTE, operandInfo.type);
 }
 
