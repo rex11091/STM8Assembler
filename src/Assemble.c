@@ -115,7 +115,7 @@ void getA_X_Y_index(Tokenizer *tokenizer,OperandInfo *operandInfo){
   }
   else
     throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
-                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                  "WRONG_TOKEN_TYPE, expecting IdentifierToken.type , but received '%d'\n", \
                    idToken->type);
 }
 
@@ -693,7 +693,7 @@ int handleDirect_X_Y_index(char *assemblyName, char **memoryToWriteCode){
     }
     else
     throwException(WRONG_TOKEN_TYPE, (void *)idToken,                           \
-                  "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                  "WRONG_TOKEN_TYPE, expecting IdentifierToken.type , but received '%d'\n", \
                    idToken->type);
   }
   else
@@ -719,7 +719,7 @@ int handleInherentInstruction(char *assemblyName, char **memoryToWriteCode){
   }
   else
   throwException(WRONG_TOKEN_TYPE, (void *)token,                           \
-                "NOT_VALID_IDENTIFIER, expecting IdentifierToken.type , but received '%d'\n", \
+                "WRONG_TOKEN_TYPE, expecting IdentifierToken.type , but received '%d'\n", \
                  token->type);
 }
 
